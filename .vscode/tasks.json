@@ -1,0 +1,49 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Next.js: Start development server",
+			"type": "shell",
+			"command": "npm run dev",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Install project dependencies",
+			"type": "shell",
+			"command": "npm install",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run food delivery app",
+			"type": "shell",
+			"command": "npm run dev",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Initialize repository and connect GitHub",
+			"type": "shell",
+			"command": "git init -b main; if ($LASTEXITCODE -eq 0) { git remote add origin https://github.com/pouyanRG/Restaurant-Menu.git }; if ($LASTEXITCODE -eq 0) { git remote -v; git ls-remote --heads origin }",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Commit and push to GitHub",
+			"type": "shell",
+			"command": "git add -A; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; git status --short; git commit -m \"Initial project commit\" -m \"Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>\"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; git push -u origin main; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; git status --short --branch",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Publish project on GitHub",
+			"type": "shell",
+			"command": "git add -A; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; git status --short; git commit -m 'Initial project commit' -m 'Co-authored-by: Copilot 223556219+Copilot@users.noreply.github.com'; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; git push -u origin main; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; git status --short --branch",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
