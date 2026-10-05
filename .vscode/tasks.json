@@ -15,6 +15,13 @@
 			"command": "npm install",
 			"isBackground": false,
 			"problemMatcher": []
+		},
+		{
+			"label": "Inspect merge changes and commits",
+			"type": "shell",
+			"command": "git diff --cached -- .github/workflows/npm-publish.yml; git diff -- .vscode/tasks.json; git show --stat --oneline --decorate HEAD; git show --format=fuller --no-patch MERGE_HEAD",
+			"isBackground": false,
+			"problemMatcher": []
 		}
 	]
 }
