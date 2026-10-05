@@ -6,7 +6,6 @@ function Item({ id, label, active, onSelect }) {
     id === "home" ? <HomeIcon /> :
     id === "message" ? <MessageIcon /> :
     id === "favorite" ? <HeartIcon width="24" height="24" /> :
-    // eslint-disable-next-line @next/next/no-img-element
     <img className="nav-avatar" src="/images/avatar.svg" alt="" />;
   return (
     <button type="button" className={`nav-item${active ? " is-active" : ""}`} aria-label={label} onClick={() => onSelect(id)}>
