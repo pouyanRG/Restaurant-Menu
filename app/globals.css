@@ -146,11 +146,58 @@ button:active { transform: scale(.94); opacity: .8; }
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25); transition: transform 0.15s;
 }
 .cta:active { transform: scale(0.92); }
+
 .badge-off {
-  position: absolute; right: 10px; bottom: 16px; transform: rotate(-8deg);
-  padding: 7px 14px; border-radius: 9999px; font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
-  color: #14532d; background: rgba(255, 255, 255, 0.75); border-color: rgba(255, 255, 255, 0.55);
-  text-shadow: none;
+  position: absolute; right: 10px; bottom: 16px;
+  transform: rotate(-8deg);
+  padding: 7px 14px;
+  border-radius: 9999px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
+  color: #0f4a28;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  isolation: isolate;
+  overflow: hidden;
+
+  /* بدنه‌ی شیشه: نیمه‌شفاف با گرادیان ملایم */
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 55%, rgba(255,255,255,0.28) 100%);
+
+  /* بلور + اشباع رنگ پشت شیشه (کلید اصلی حس iOS) */
+  -webkit-backdrop-filter: blur(14px) saturate(180%) brightness(1.05);
+  backdrop-filter: blur(14px) saturate(180%) brightness(1.05);
+
+  /* لبه و عمق */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),    /* هایلایت لبه‌ی بالا */
+    inset 0 -1px 1px rgba(255, 255, 255, 0.25),  /* بازتاب لبه‌ی پایین */
+    inset 0 0 12px rgba(255, 255, 255, 0.25),    /* درخشش داخلی */
+    0 6px 16px rgba(60, 100, 90, 0.18),          /* سایه‌ی بیرونی */
+    0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* انعکاس نور روی نیمه‌ی بالایی */
+.badge-off::before {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* لبه‌ی گرادیانی ظریف (نور از بالا-چپ) */
+.badge-off::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.6));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 /* Card colour system */
