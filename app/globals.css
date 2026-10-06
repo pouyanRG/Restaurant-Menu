@@ -121,7 +121,14 @@ button:active { transform: scale(.94); opacity: .8; }
 .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 4px; padding-right: 2px; }
 .card h3 { font-size: 14px; font-weight: 400; line-height: 1.25; color: #1d1d1d; }
 .price { margin-top: 8px; font-size: 14px; font-weight: 800; }
-.old-price { font-weight: 400; font-size: 12px; color: var(--muted); margin-left: 4px; }
+.old-price {
+  display: block;      /* می‌ره خط بعد، زیر قیمت فعلی */
+  margin-left: 0;      /* حاشیه‌ی قبلی دیگه لازم نیست */
+  margin-top: 2px;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--muted);
+}
 .wish { width: 44px; height: 44px; margin: -10px -12px 0 0; display: grid; place-items: center; flex: none; color: var(--ink); }
 .wish.is-on { color: #ee3b4f; }
 .wish svg { width: 24px; height: 24px; }
@@ -147,52 +154,45 @@ button:active { transform: scale(.94); opacity: .8; }
 }
 .cta:active { transform: scale(0.92); }
 
+html.glass-refract .badge-off {
+  backdrop-filter: url(#liquid-glass) blur(1px) saturate(140%) brightness(1.1);
+}
+
 .badge-off {
   position: absolute; right: 10px; bottom: 16px;
-  transform: rotate(-8deg);
   padding: 7px 14px;
   border-radius: 9999px;
   font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
-  color: #0f4a28;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  color: #0f3d24;
   isolation: isolate;
-  overflow: hidden;
 
-  /* بدنه‌ی شیشه: نیمه‌شفاف با گرادیان ملایم */
-  background:
-    linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 55%, rgba(255,255,255,0.28) 100%);
+  /* تقریباً شفاف، فقط یه رگه‌ی سفید خیلی کم */
+  background: rgba(255, 255, 255, 0.10);
 
-  /* بلور + اشباع رنگ پشت شیشه (کلید اصلی حس iOS) */
-  -webkit-backdrop-filter: blur(14px) saturate(180%) brightness(1.05);
-  backdrop-filter: blur(14px) saturate(180%) brightness(1.05);
+  /* بلور کم، تا پشتش دیده بشه */
+  -webkit-backdrop-filter: blur(5px) saturate(140%) brightness(1.1);
+  backdrop-filter: blur(5px) saturate(140%) brightness(1.1);
 
-  /* لبه و عمق */
-  border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.9),    /* هایلایت لبه‌ی بالا */
-    inset 0 -1px 1px rgba(255, 255, 255, 0.25),  /* بازتاب لبه‌ی پایین */
-    inset 0 0 12px rgba(255, 255, 255, 0.25),    /* درخشش داخلی */
-    0 6px 16px rgba(60, 100, 90, 0.18),          /* سایه‌ی بیرونی */
-    0 1px 3px rgba(0, 0, 0, 0.08);
+    inset 2px 2px 1px -1px rgba(255, 255, 255, 0.95),   /* لبه‌ی روشن بالا-چپ */
+    inset -2px -2px 1px -1px rgba(255, 255, 255, 0.75), /* لبه‌ی روشن پایین-راست */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.20),          /* حلقه‌ی کم‌رنگ دور تا دور */
+    inset 0 0 16px rgba(255, 255, 255, 0.20),           /* درخشش داخلی */
+    0 10px 24px rgba(0, 0, 0, 0.14),                    /* سایه‌ی نرم و پخش */
+    0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-/* انعکاس نور روی نیمه‌ی بالایی */
-.badge-off::before {
-  content: "";
-  position: absolute; inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 50%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* لبه‌ی گرادیانی ظریف (نور از بالا-چپ) */
+/* خط نور روی لبه: روشن در دو گوشه، شفاف در وسط */
 .badge-off::after {
   content: "";
   position: absolute; inset: 0;
   border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.6));
+  padding: 1.5px;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,0) 35%,
+    rgba(255,255,255,0) 65%,
+    rgba(255,255,255,0.85) 100%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
