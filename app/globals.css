@@ -371,3 +371,87 @@ html.glass-refract .badge-off {
   .price { font-size: clamp(12px, 9.2cqw, 14px); }
   .old-price { font-size: clamp(10px, 7.6cqw, 12px); }
 }
+
+
+/* ============ Floating pill bottom nav ============ */
+.bottom-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: calc(14px + var(--safe-bottom));
+  transform: translateX(-50%);
+  width: min(calc(100% - 28px), calc(var(--app-w) - 28px));
+  height: 72px;
+  z-index: 20;
+}
+
+.bottom-nav {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  border-radius: 9999px;
+  -webkit-mask: none;
+  mask: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(222, 235, 250, 0.42));
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  backdrop-filter: blur(18px) saturate(170%);
+  box-shadow:
+    inset 1.5px 1.5px 1px -1px rgba(255, 255, 255, 0.95),
+    inset -1.5px -1.5px 1px -1px rgba(255, 255, 255, 0.7),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+    inset 0 0 18px rgba(255, 255, 255, 0.3),
+    0 14px 30px rgba(70, 90, 120, 0.18),
+    0 3px 8px rgba(70, 90, 120, 0.10);
+}
+
+.nav-group { display: contents; }
+.nav-gap { display: none; }
+
+.nav-item {
+  position: relative;
+  isolation: isolate;
+  flex: 1;
+  max-width: 84px;
+  height: 62px;
+  padding-top: 8px;
+  gap: 2px;
+  justify-content: flex-start;
+  color: #4a5670;
+}
+.nav-label { font-size: 12.5px; font-weight: 500; letter-spacing: 0.2px; }
+
+/* highlight pill behind active item */
+.nav-item.is-active::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 0;
+  z-index: -1;
+  border-radius: 44px;
+  background: linear-gradient(160deg, rgba(120, 220, 150, 0.28), rgba(255, 255, 255, 0.35));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+    inset 0 0 14px rgba(120, 220, 150, 0.25);
+}
+.nav-item.is-active .nav-label { font-weight: 700; }
+.nav-dot { bottom: 2px; width: 6px; height: 6px; }
+
+.nav-avatar {
+  width: 30px;
+  height: 30px;
+  background: rgba(74, 86, 112, 0.18);
+  box-shadow: none;
+}
+.nav-ic { height: 30px; }
+
+/* cart FAB: floats above the right side of the bar */
+.fab {
+  left: auto;
+  right: 6px;
+  top: -66px;
+  transform: none;
+  width: 54px;
+  height: 54px;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.5), 0 10px 22px rgba(23, 180, 72, 0.4);
+}

@@ -11,7 +11,7 @@ function Item({ id, label, active, onSelect }) {
     <button type="button" className={`nav-item${active ? " is-active" : ""}`} aria-label={label} onClick={() => onSelect(id)}>
       <span className="nav-ic">{icon}</span>
       <span className="nav-label">{label}</span>
-      {active && <span className="nav-dot" />}
+      
     </button>
   );
 }
