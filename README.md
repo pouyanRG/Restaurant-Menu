@@ -52,4 +52,5 @@ The home page composes the header, search and filter controls, category scroller
 
 ## Environment variables
 
+
 No environment variables are required for local development. Put local secrets in `.env.local`; do not commit secret values. Use `.env.example` to document required variable names without including credentials.
