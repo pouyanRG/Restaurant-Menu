@@ -35,6 +35,11 @@ export const ChevronRight = (p) => (
     <path d="M9.5 5.5l6.5 6.5-6.5 6.5" />
   </svg>
 );
+export const PlusIcon = (p) => (
+  <svg viewBox="0 0 24 24" width="20" height="20" {...base} strokeWidth={2.2} {...p}>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+);
 export const HomeIcon = (p) => (
   <svg viewBox="0 0 24 24" width="24" height="24" {...base} fill="currentColor" {...p}>
     <path d="M4 11l8-7 8 7v8.5a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H5.5A1.5 1.5 0 0 1 4 19.5z" />

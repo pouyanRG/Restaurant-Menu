@@ -1,7 +1,7 @@
 import { SearchIcon } from "./Icons";
 import FilterModalTrigger from "./FilterModalTrigger";
 
-export default function SearchSection({ value, onChange }) {
+export default function SearchSection({ value, onChange, onOpenFilters }) {
   return (
     <div className="search glass">
       <SearchIcon className="search-lead" />
@@ -12,7 +12,12 @@ export default function SearchSection({ value, onChange }) {
         onChange={(e) => onChange(e.target.value)}
         aria-label="Search food"
       />
-      <FilterModalTrigger />
+      {value && (
+        <button type="button" className="search-trail" aria-label="Clear search" onClick={() => onChange("")}>
+          ✕
+        </button>
+      )}
+      <FilterModalTrigger onClick={onOpenFilters} />
     </div>
   );
 }

@@ -22,6 +22,41 @@
 			"command": "git diff --cached -- .github/workflows/npm-publish.yml; git diff -- .vscode/tasks.json; git show --stat --oneline --decorate HEAD; git show --format=fuller --no-patch MERGE_HEAD",
 			"isBackground": false,
 			"problemMatcher": []
+		},
+		{
+			"label": "lint-check",
+			"type": "shell",
+			"command": "npm run lint",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "next-build",
+			"type": "shell",
+			"command": "npx next build",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "dev-server",
+			"type": "shell",
+			"command": "npm run dev",
+			"args": [
+				"--",
+				"--hostname",
+				"0.0.0.0",
+				"--port",
+				"3000"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "dev-server-cmd",
+			"type": "shell",
+			"command": "cmd /c \"npm run dev -- --hostname 0.0.0.0 --port 3000\"",
+			"isBackground": true,
+			"problemMatcher": []
 		}
 	]
 }

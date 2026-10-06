@@ -1,4 +1,18 @@
 import "./globals.css";
+import { Roboto, Vazirmatn } from "next/font/google";
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400", "500", "700", "800"],
+  display: "swap",
+  variable: "--font-roboto"
+});
+
+const vazir = Vazirmatn({
+  subsets: ["arabic"],
+  display: "swap",
+  variable: "--font-vazir"
+});
 
 export const metadata = {
   title: "Food Delivery",
@@ -14,7 +28,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${roboto.variable} ${vazir.variable}`}>
       <body>{children}</body>
     </html>
   );

@@ -16,7 +16,7 @@ function Item({ id, label, active, onSelect }) {
   );
 }
 
-export default function CurvedBottomNavigation({ items, active, onSelect, cartCount }) {
+export default function CurvedBottomNavigation({ items, active, onSelect, cartCount, onOpenCart }) {
   const left = items.slice(0, 2);
   const right = items.slice(2);
   return (
@@ -26,7 +26,7 @@ export default function CurvedBottomNavigation({ items, active, onSelect, cartCo
         <div className="nav-gap" />
         <div className="nav-group">{right.map((i) => <Item key={i.id} {...i} active={active === i.id} onSelect={onSelect} />)}</div>
       </nav>
-      <FloatingCartFAB count={cartCount} />
+      <FloatingCartFAB count={cartCount} onClick={onOpenCart} />
     </div>
   );
 }
