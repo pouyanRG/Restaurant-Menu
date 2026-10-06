@@ -320,3 +320,54 @@ html.glass-refract .badge-off {
 
 /* لوکیشن: شیشه‌ی مایل به لیمویی */
 .location-pin { background: rgba(207, 238, 58, 0.35); }
+
+
+/* ============ Responsive: price / add button / badge-off ============ */
+
+/* هر کارت یک container می‌شود تا اندازه‌ها نسبت به عرض خود کارت تنظیم شوند، نه عرض صفحه */
+.card { container-type: inline-size; --cta: 38px; }
+
+/* دکمه + */
+.cta {
+  width: var(--cta);
+  height: var(--cta);
+  left: 12px;
+  bottom: 12px;
+}
+
+/* بج: همیشه فقط در فضای باقی‌مانده‌ی کنار دکمه + جا می‌گیرد، پس هرگز روی آن نمی‌افتد */
+.badge-off {
+  left: calc(12px + var(--cta) + 6px);
+  right: 10px;
+  bottom: calc(12px + (var(--cta) - 28px) / 2);
+  height: 28px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+/* قیمت همیشه بالای عکس بماند */
+.price,
+.old-price { position: relative; z-index: 2; }
+
+/* مقیاس‌پذیری روان بر اساس عرض کارت (مرورگرهایی که container units دارند) */
+@supports (width: 1cqw) {
+  .card { --cta: clamp(34px, 27cqw, 44px); }
+
+  .cta { left: clamp(10px, 9cqw, 14px); bottom: clamp(10px, 9cqw, 14px); }
+
+  .badge-off {
+    left: calc(clamp(10px, 9cqw, 14px) + var(--cta) + clamp(4px, 3cqw, 6px));
+    right: clamp(8px, 6.5cqw, 10px);
+    bottom: calc(clamp(10px, 9cqw, 14px) + (var(--cta) - 28px) / 2);
+    font-size: clamp(10px, 7.6cqw, 12px);
+    padding: 0 clamp(4px, 3cqw, 8px);
+  }
+
+  .price { font-size: clamp(12px, 9.2cqw, 14px); }
+  .old-price { font-size: clamp(10px, 7.6cqw, 12px); }
+}
