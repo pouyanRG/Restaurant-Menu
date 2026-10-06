@@ -212,8 +212,8 @@ html.glass-refract .badge-off {
 .bottom-wrap {
   position: fixed; left: 50%; bottom: 0; transform: translateX(-50%);
   width: min(100%, var(--app-w)); height: calc(84px + var(--safe-bottom)); z-index: 20;
-  filter: drop-shadow(0 -6px 12px rgba(100, 140, 140, 0.18));
 }
+
 .bottom-nav {
   position: absolute; inset: 0; display: flex; align-items: flex-start; padding: 16px 12px var(--safe-bottom);
   background: rgba(255, 255, 255, 0.68);
@@ -250,3 +250,73 @@ html.glass-refract .badge-off {
   .content { padding-top: 0; }
   .app { box-shadow: 0 0 60px rgba(60, 100, 100, 0.18); }
 }
+
+/* ============ iOS Liquid Glass (shared with .badge-off) ============ */
+.search,
+.icon-btn,
+.location-pin,
+.cta,
+.bottom-nav {
+  isolation: isolate;
+  border: 0;
+  background: rgba(255, 255, 255, 0.10);
+  -webkit-backdrop-filter: blur(5px) saturate(140%) brightness(1.1);
+  backdrop-filter: blur(5px) saturate(140%) brightness(1.1);
+  box-shadow:
+    inset 2px 2px 1px -1px rgba(255, 255, 255, 0.95),
+    inset -2px -2px 1px -1px rgba(255, 255, 255, 0.75),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.20),
+    inset 0 0 16px rgba(255, 255, 255, 0.20),
+    0 10px 24px rgba(0, 0, 0, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* خط نور روی لبه */
+.search::after,
+.icon-btn::after,
+.location-pin::after,
+.cta::after,
+.bottom-nav::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,0) 35%,
+    rgba(255,255,255,0) 65%,
+    rgba(255,255,255,0.85) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* این‌ها position نداشتن، pseudo-element لازم داره */
+.search,
+.icon-btn,
+.location-pin { position: relative; }
+
+/* ---- تنظیمات هر المان ---- */
+
+/* دکمه + : آیکن تیره مثل متن badge */
+.cta { color: #0f3d24; }
+
+/* سرچ‌باکس و نوبار: کمی سفیدتر برای خوانایی متن */
+.search { background: rgba(255, 255, 255, 0.28); }
+
+.bottom-nav {
+  background: rgba(255, 255, 255, 0.30);
+  -webkit-backdrop-filter: blur(14px) saturate(160%) brightness(1.08);
+  backdrop-filter: blur(14px) saturate(160%) brightness(1.08);
+  /* mask شکل برش FAB رو می‌بُره، سایه‌ی بیرونی بی‌اثره */
+  box-shadow:
+    inset 2px 2px 1px -1px rgba(255, 255, 255, 0.95),
+    inset -2px -2px 1px -1px rgba(255, 255, 255, 0.75),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.20),
+    inset 0 0 16px rgba(255, 255, 255, 0.25);
+}
+
+/* لوکیشن: شیشه‌ی مایل به لیمویی */
+.location-pin { background: rgba(207, 238, 58, 0.35); }
