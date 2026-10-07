@@ -13,7 +13,6 @@ export default function HomePage() {
   const [category, setCategory] = useState("All");
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("home");
-  const [cart, setCart] = useState([]);
   const [toast, setToast] = useState("");
   const timer = useRef(null);
 
@@ -29,18 +28,9 @@ export default function HomePage() {
 
   const [favs, toggleFav] = useFavs();
 
-  const addToCart = (p) => {
-    setCart((c) => [...c, p]);
-    showToast(`${p.name} added to cart`);
-  };
-
   const openFilters = () => showToast("Filters coming soon");
   const openNotifications = () => showToast("Notifications coming soon");
   const openLocation = () => showToast("Location picker coming soon");
-  const openCart = () => {
-    const items = cart.length;
-    showToast(items ? `${items} item${items > 1 ? "s" : ""} in cart` : "Your cart is empty");
-  };
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -61,12 +51,12 @@ export default function HomePage() {
             <HeaderBar onOpenLocation={openLocation} onOpenNotifications={openNotifications} />
             <SearchSection value={query} onChange={setQuery} onOpenFilters={openFilters} />
             <CategoryHorizontalScroller items={categories} active={category} onSelect={setCategory} />
-            <ProductGrid products={visible} onAdd={addToCart} liked={favs} onToggleLike={toggleFav} />
+            <ProductGrid products={visible} liked={favs} onToggleLike={toggleFav} />
           </>
         ) : tab === "favorite" ? (
           <>
             <HeaderBar onOpenLocation={openLocation} onOpenNotifications={openNotifications} />
-            <ProductGrid products={favoriteProducts} onAdd={addToCart} liked={favs} onToggleLike={toggleFav} />
+            <ProductGrid products={favoriteProducts} liked={favs} onToggleLike={toggleFav} />
           </>
         ) : (
           <>
@@ -82,8 +72,6 @@ export default function HomePage() {
         items={navItems}
         active={tab}
         onSelect={setTab}
-        cartCount={cart.length}
-        onOpenCart={openCart}
       />
     </AppLayout>
   );

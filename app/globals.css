@@ -446,17 +446,6 @@ html.glass-refract .badge-off {
 }
 .nav-ic { height: 30px; }
 
-/* cart FAB: floats above the right side of the bar */
-.fab {
-  left: auto;
-  right: 6px;
-  top: -66px;
-  transform: none;
-  width: 54px;
-  height: 54px;
-  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.5), 0 10px 22px rgba(23, 180, 72, 0.4);
-}
-
 /* ============ Card link ============ */
 .card-link { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
 .wish { position: relative; z-index: 2; }

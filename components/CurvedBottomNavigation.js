@@ -1,5 +1,4 @@
 import { HomeIcon, MessageIcon, HeartIcon } from "./Icons";
-import FloatingCartFAB from "./FloatingCartFAB";
 
 function Item({ id, label, active, onSelect }) {
   const icon =
@@ -16,17 +15,15 @@ function Item({ id, label, active, onSelect }) {
   );
 }
 
-export default function CurvedBottomNavigation({ items, active, onSelect, cartCount, onOpenCart }) {
+export default function CurvedBottomNavigation({ items, active, onSelect }) {
   const left = items.slice(0, 2);
   const right = items.slice(2);
   return (
     <div className="bottom-wrap">
       <nav className="bottom-nav" aria-label="Main navigation">
         <div className="nav-group">{left.map((i) => <Item key={i.id} {...i} active={active === i.id} onSelect={onSelect} />)}</div>
-        <div className="nav-gap" />
         <div className="nav-group">{right.map((i) => <Item key={i.id} {...i} active={active === i.id} onSelect={onSelect} />)}</div>
       </nav>
-      <FloatingCartFAB count={cartCount} onClick={onOpenCart} />
     </div>
   );
 }

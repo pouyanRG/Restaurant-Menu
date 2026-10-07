@@ -1,6 +1,6 @@
 import ProductCard from "./ProductCard";
 
-export default function ProductGrid({ products, onAdd, liked, onToggleLike }) {
+export default function ProductGrid({ products, liked, onToggleLike }) {
   if (!products.length) {
     return <p className="empty">Nothing found. Try another search or category.</p>;
   }
@@ -11,7 +11,6 @@ export default function ProductGrid({ products, onAdd, liked, onToggleLike }) {
         <ProductCard
           key={p.id}
           product={p}
-          onAdd={onAdd}
           liked={liked.has(p.id)}
           onToggleLike={() => onToggleLike(p.id)}
         />
