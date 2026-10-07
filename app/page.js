@@ -7,13 +7,13 @@ import CategoryHorizontalScroller from "@/components/CategoryHorizontalScroller"
 import ProductGrid from "@/components/ProductGrid";
 import CurvedBottomNavigation from "@/components/CurvedBottomNavigation";
 import { categories, products, navItems } from "@/data/products";
+import useFavs from "@/lib/useFavs";
 
 export default function HomePage() {
   const [category, setCategory] = useState("All");
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("home");
   const [cart, setCart] = useState([]);
-  const [favs, setFavs] = useState(new Set());
   const [toast, setToast] = useState("");
   const timer = useRef(null);
 
@@ -27,14 +27,7 @@ export default function HomePage() {
     timer.current = setTimeout(() => setToast(""), 1600);
   };
 
-  const toggleFav = (id) => {
-    setFavs((s) => {
-      const next = new Set(s);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  const [favs, toggleFav] = useFavs();
 
   const addToCart = (p) => {
     setCart((c) => [...c, p]);

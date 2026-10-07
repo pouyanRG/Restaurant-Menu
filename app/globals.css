@@ -145,6 +145,7 @@ button:active { transform: scale(.94); opacity: .8; }
 .img-fries   { left: 36%;   top: 20%; width: 52%; }
 .img-chicken { left: 37%; top: 25%; width: 64%; }
 .img-pizza   { left: 36%;   top: 24%; width: 64%; }
+.img-lazania { left: 32%;   top: 24%; width: 68%; }
 .img-drink   { left: 40%;   top: 26%;   width: 62%; -webkit-mask-image: none; mask-image: none; }
 
 .cta {
@@ -455,3 +456,25 @@ html.glass-refract .badge-off {
   height: 54px;
   box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.5), 0 10px 22px rgba(23, 180, 72, 0.4);
 }
+
+/* ============ Card link ============ */
+.card-link { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+.wish { position: relative; z-index: 2; }
+.price, .old-price { pointer-events: none; }
+a.icon-btn { text-decoration: none; color: inherit; }
+
+/* ============ Details ============ */
+.details { min-height: 100dvh; display: flex; flex-direction: column; gap: 16px; padding: 12px var(--pad) calc(24px + var(--safe-bottom)); }
+.details-top { display: flex; align-items: center; justify-content: space-between; }
+.details-top h1 { margin: 0; font-size: 20px; font-weight: 700; }
+.details-fav.is-on { color: #ee3b4f; }
+.details-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 50%; border: 6px solid #fff; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.15); }
+.details-name { margin: 0; font-size: 26px; font-weight: 700; }
+.details-meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 14px; color: #333; }
+.details-desc { font-size: 15px; line-height: 1.6; color: #444; }
+.details-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.details-chips span { padding: 6px 12px; border-radius: 9999px; background: rgba(207, 238, 58, 0.45); font-size: 13px; }
+.details-bottom { margin-top: auto; display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px dashed rgba(0, 0, 0, 0.2); }
+.details-bottom small { display: block; font-size: 12px; color: var(--muted); }
+.details-bottom strong { font-size: 24px; }
+.details-back { background: #0d0d0d; color: #fff; padding: 16px 28px; border-radius: 9999px; font-size: 16px; text-decoration: none; }
