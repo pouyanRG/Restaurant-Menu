@@ -42,7 +42,7 @@ button:active { transform: scale(.94); opacity: .8; }
     radial-gradient(80% 30% at 0% 60%, #c8f1ea 0%, rgba(200, 241, 234, 0) 70%),
     linear-gradient(180deg, #e7f7ac 0%, #d3f3d2 17%, #cdeff0 42%, #def3f5 75%, #e8f6f6 100%);
 }
-.content { padding: 0 var(--pad) calc(120px + var(--safe-bottom)); }
+.content { padding: var(--safe-top) var(--pad) calc(120px + var(--safe-bottom)); }
 .empty { margin: 60px 0; text-align: center; color: var(--muted); font-size: 15px; }
 .toast {
   position: fixed; left: 50%; bottom: calc(110px + var(--safe-bottom));
@@ -60,14 +60,6 @@ button:active { transform: scale(.94); opacity: .8; }
   backdrop-filter: blur(10px);
 }
 .glass-card { will-change: transform, backdrop-filter; transform: translateZ(0); }
-
-/* ============ Status bar (mockup) ============ */
-.status-bar { display: none; }
-.content { padding-top: var(--safe-top); }
-@media (min-width: 431px) {
-  .status-bar { display: flex; }
-  .content { padding-top: 0; }
-}
 
 /* ============ Header ============ */
 .header-bar { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
@@ -141,15 +133,18 @@ button:active { transform: scale(.94); opacity: .8; }
   mask-image: linear-gradient(90deg, transparent 0, #000 14%), linear-gradient(180deg, transparent 0, #000 12%, #000 90%, transparent 100%);
   mask-composite: intersect;
 }
-.img-burger  { left: 32%;   top: 27.6%; width: 66%; }
-.img-fries   { left: 36%;   top: 20%; width: 52%; }
-.img-chicken { left: 37%; top: 25%; width: 64%; }
-.img-pizza   { left: 36%;   top: 24%; width: 64%; }
+.img-burger  { left: 32%;   top: 30%; width: 66%; }
+.img-fries   { left: 36%;   top: 19%; width: 52%; }
+.img-chicken { left: 35%;   top: 23%; width: 65%; }
+.img-pizza   { left: 30%;   top: 20%; width: 70%; }
 .img-lazania { left: 32%;   top: 24%; width: 68%; }
-.img-drink   { left: 40%;   top: 26%;   width: 62%; -webkit-mask-image: none; mask-image: none; }
+.img-hot-dog { left: 28%;   top: 42%; width: 72%; }
+.img-pasta   { left: 22%;   top: 23%; width: 82%; }
+.img-caesar  { left: 30%;   top: 19%; width: 73%; }
+.img-drink   { left: 33%;   top: 20%; width: 70%; -webkit-mask-image: none; mask-image: none; }
 
 .cta {
-  position: absolute; left: 14px; bottom: 14px; width: 44px; height: 44px; border-radius: 50%;
+  position: absolute; left: 14px; bottom: 14px; width: 44 px; height: 44px; border-radius: 50%;
   display: grid; place-items: center; background: #0d0d0d; color: #fff;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25); transition: transform 0.15s;
 }
@@ -247,8 +242,6 @@ html.glass-refract .badge-off {
 }
 
 @media (min-width: 431px) {
-  .status-bar { display: flex; }
-  .content { padding-top: 0; }
   .app { box-shadow: 0 0 60px rgba(60, 100, 100, 0.18); }
 }
 

@@ -1,4 +1,3 @@
-import StatusBar from "./StatusBar";
 import LiquidGlassDefs from "./LiquidGlassDefs";
 
 export default function AppLayout({ children }) {
@@ -6,7 +5,6 @@ export default function AppLayout({ children }) {
     <div className="stage">
       <LiquidGlassDefs />
       <main className="app">
-        <StatusBar />
         {children}
       </main>
     </div>

@@ -60,16 +60,3 @@ export const BagIcon = (p) => (
     <path d="M9.5 14.5c.6 1.2 1.4 1.8 2.5 1.8s1.9-.6 2.5-1.8" />
   </svg>
 );
-export const StatusIcons = () => (
-  <svg width="62" height="12" viewBox="0 0 62 12" fill="#000">
-    <rect x="0" y="7.5" width="2.6" height="3.5" rx=".7" />
-    <rect x="4" y="5.5" width="2.6" height="5.5" rx=".7" />
-    <rect x="8" y="3.2" width="2.6" height="7.8" rx=".7" />
-    <rect x="12" y="1" width="2.6" height="10" rx=".7" />
-    <path d="M26.5 4.2a7 7 0 0 1 9 0M28.2 6.3a4.5 4.5 0 0 1 5.6 0M30 8.4a2 2 0 0 1 2 0" stroke="#000" strokeWidth="1.3" fill="none" strokeLinecap="round" />
-    <circle cx="31" cy="10" r="1" />
-    <rect x="41" y="1.2" width="18" height="9.6" rx="2.8" fill="none" stroke="#000" strokeOpacity=".4" />
-    <rect x="42.5" y="2.7" width="15" height="6.6" rx="1.8" />
-    <rect x="59.8" y="4.2" width="1.5" height="3.6" rx=".7" fill="#000" fillOpacity=".4" />
-  </svg>
-);

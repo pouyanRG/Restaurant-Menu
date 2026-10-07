@@ -5,9 +5,11 @@ export default function ProductGrid({ products, liked, onToggleLike }) {
     return <p className="empty">Nothing found. Try another search or category.</p>;
   }
 
+  const sortedProducts = [...products].sort((a, b) => a.id - b.id);
+
   return (
     <section className="grid" aria-label="Products">
-      {products.map((p) => (
+      {sortedProducts.map((p) => (
         <ProductCard
           key={p.id}
           product={p}
