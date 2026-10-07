@@ -16,7 +16,9 @@ export default function ProductCard({ product, liked, onToggleLike }) {
       <p className="price">
         ${final.toFixed(2)} <s className="old-price">${product.price.toFixed(2)}</s>
       </p>
-      <img className={`card-img ${product.imgClass}`} src={product.image} alt="" draggable="false" />
+      <div className="card-media">
+        <img className="card-img" src={product.image} alt="" draggable="false" />
+      </div>
       <span className="cta" aria-hidden="true"><ChevronRight /></span>
       <DiscountBadge percent={product.discount} />
     </article>
