@@ -51,14 +51,14 @@ export const products = [
     ingredients: ["Sausage", "Bun", "Mustard", "Onion"]
   },
   {
-    id: 7, name: "Alfredo Pasta", price: 3.5, discount: 15, image: "/images/penne-pasta.webp",
+    id: 8, name: "Alfredo Pasta", price: 3.5, discount: 15, image: "/images/penne-pasta.webp",
     category: "Sides", theme: "blue", imgClass: "img-pasta",
     description: "Creamy Alfredo sauce tossed with tender pasta and parmesan.",
     time: 14, rating: 4.6, calories: 620,
     ingredients: ["Pasta", "Cream", "Parmesan", "Butter"]
   },
   {
-    id: 8, name: "Caesar Salad", price: 7.0, discount: 10, image: "/images/salad.webp",
+    id: 9, name: "Caesar Salad", price: 7.0, discount: 10, image: "/images/salad.webp",
     category: "Sides", theme: "green", imgClass: "img-caesar",
     description: "Crispy or grilled roll with lettuce, special Caesar dressing, cherry tomatoes, olives, croutons, and grated Parmesan cheese.",
     time: 7, rating: 4.4, calories: 240,
@@ -93,7 +93,7 @@ export const products = [
     ingredients: ["Beef steak", "Herbs", "Spices"]
   },
   {
-    id: 8, name: "Soup", price: 4.0, discount: 5, image: "/images/Soup.webp",
+    id: 10, name: "Soup", price: 4.0, discount: 5, image: "/images/Soup.webp",
     category: "Sides", theme: "green", imgClass: "img-pasta",
     description: "A warm, comforting soup made with fresh ingredients.",
     time: 10, rating: 4.5, calories: 220,
