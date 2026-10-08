@@ -20,3 +20,6 @@ export default function ProductGrid({ products, liked, onToggleLike }) {
     </section>
   );
 }
+
+
+
