@@ -54,6 +54,8 @@ The home page composes the header, search and filter controls, category scroller
 
 The chat API requires a Gemini API key and Upstash Redis credentials. Copy the variable names from `.env.example` into `.env.local`, then fill in the secret values. Never commit `.env.local` or expose API keys with a `NEXT_PUBLIC_` prefix.
 
+
+
 - `GEMINI_API_KEY`: secret key from Google AI Studio.
 - `GEMINI_MODEL`: model name; defaults to `gemini-3.8-flash`.
 - `SITE_ORIGIN`: exact production origin, such as `https://example.com`; local development uses `http://localhost:3000`.
