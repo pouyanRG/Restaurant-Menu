@@ -1,23 +1,88 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { ChevronRight, SendIcon } from "./Icons";
+import { products } from "@/data/products";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-const QUICK = ["یه چیز سبک پیشنهاد بده", "What's the best pizza?", "ارزون‌ترین غذا چیه؟"];
+const QUICK = ["ارزون‌ترین غذا چیه؟", "What's the best pizza?", "یه چیز سبک"];
+const MAX_LEN = 500;
+
+// اسم غذاهای ذکرشده در جواب بات را پیدا می‌کند تا کارت نشان بدهیم
+function findMentioned(text) {
+  let rest = text.toLowerCase();
+  const found = [];
+  [...products]
+    .sort((a, b) => b.name.length - a.name.length) // اول اسم‌های بلندتر (Pepperoni Pizza قبل از Pizza)
+    .forEach((p) => {
+      const name = p.name.toLowerCase();
+      const i = rest.indexOf(name);
+      if (i === -1) return;
+      found.push({ p, i });
+      rest = rest.slice(0, i) + " ".repeat(name.length) + rest.slice(i + name.length);
+    });
+  return found.sort((a, b) => a.i - b.i).slice(0, 3).map((f) => f.p);
+}
+
+function MiniCard({ product }) {
+  const final = product.price * (1 - product.discount / 100);
+  return (
+    <Link href={`/food/${product.id}`} className={`mc theme-${product.theme}`}>
+      <img className="mc-img" src={product.image} alt="" draggable="false" />
+      <span className="mc-tx">
+        <b>{product.name}</b>
+        <small>{product.time} min · {product.calories} kcal</small>
+      </span>
+      <span className="mc-price">${final.toFixed(2)}</span>
+      <span className="mc-go" aria-hidden="true"><ChevronRight /></span>
+    </Link>
+  );
+}
 
 export default function ChatSection() {
   const [messages, setMessages] = useState([
-    { role: "model", text: "سلام! درباره منو هر سوالی داری بپرس 🍕" }
+    { role: "model", text: "سلام! درباره منو هر سوالی داری بپرس" }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [typingIndex, setTypingIndex] = useState(null);
+  const [shown, setShown] = useState(0);
+  const busy = loading || typingIndex !== null;
   const endRef = useRef(null);
+  const taRef = useRef(null);
   const widgetBox = useRef(null);
   const widgetId = useRef(null);
   const tokenRef = useRef("");
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+    endRef.current?.scrollIntoView({ behavior: typingIndex !== null ? "auto" : "smooth" });
+  }, [messages, loading, shown, typingIndex]);
+
+  useEffect(() => {
+    if (typingIndex === null) return undefined;
+
+    const total = Array.from(messages[typingIndex]?.text || "").length;
+    const step = Math.max(1, Math.ceil(total / 150));
+    let current = 0;
+    const id = setInterval(() => {
+      current = Math.min(current + step, total);
+      setShown(current);
+      if (current >= total) {
+        clearInterval(id);
+        setTypingIndex(null);
+      }
+    }, 25);
+
+    return () => clearInterval(id);
+  }, [typingIndex, messages]);
+
+  // تکست‌اریا با تایپ بزرگ می‌شود
+  useEffect(() => {
+    const el = taRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 120) + "px";
+  }, [input]);
 
   useEffect(() => {
     if (!SITE_KEY) return undefined;
@@ -57,7 +122,7 @@ export default function ChatSection() {
 
   async function send(text) {
     const content = text.trim();
-    if (!content || loading) return;
+    if (!content || busy) return;
 
     if (SITE_KEY && !tokenRef.current) {
       setMessages((current) => [
@@ -87,8 +152,12 @@ export default function ChatSection() {
           ? data.reply
           : "خطا در دریافت پاسخ";
       setMessages([...next, { role: "model", text: reply || "پاسخی دریافت نشد." }]);
+      setShown(0);
+      setTypingIndex(next.length);
     } catch {
       setMessages([...next, { role: "model", text: "خطا در اتصال. دوباره تلاش کن." }]);
+      setShown(0);
+      setTypingIndex(next.length);
     } finally {
       setLoading(false);
       if (SITE_KEY && window.turnstile && widgetId.current !== null) {
@@ -103,36 +172,69 @@ export default function ChatSection() {
     send(input);
   }
 
+  function handleKeyDown(event) {
+    if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+      event.preventDefault();
+      send(input);
+    }
+  }
+
   return (
     <section className="chat" aria-label="Chat">
-      <div className="chat-list" role="log" aria-live="polite">
-        {messages.map((message, index) => (
-          <div key={index} dir="auto" className={`bubble ${message.role === "user" ? "me" : "bot"}`}>
-            {message.text}
+      <div className="chat-list" dir="rtl" role="log" aria-live="polite">
+        {messages.map((message, index) => {
+          const isTyping = index === typingIndex;
+          const text = isTyping ? Array.from(message.text).slice(0, shown).join("") : message.text;
+          const cards = message.role === "model" && index > 0 && !isTyping ? findMentioned(message.text) : [];
+          return (
+            <div key={index} className="chat-row">
+              <div dir="auto" className={`bubble ${message.role === "user" ? "me" : "bot"}`}>
+                {text}
+              </div>
+              {cards.length > 0 && (
+                <div className="mc-list">
+                  {cards.map((p) => <MiniCard key={p.id} product={p} />)}
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {loading && (
+          <div className="bubble bot thinking" role="status" aria-label="Thinking">
+            <span /><span /><span />
           </div>
-        ))}
-        {loading && <div className="bubble bot">...</div>}
+        )}
         <div ref={endRef} />
       </div>
+
       <p className="chat-privacy" dir="auto">برای پاسخ‌گویی، پیام‌ها به Google ارسال می‌شوند؛ اطلاعات شخصی ننویس.</p>
+
       <div className="chat-quick">
         {QUICK.map((question) => (
-          <button key={question} type="button" className="chip" onClick={() => send(question)} disabled={loading}>
+          <button key={question} type="button" className="chip" onClick={() => send(question)} disabled={busy}>
             {question}
           </button>
         ))}
       </div>
+
       {SITE_KEY && <div ref={widgetBox} className="chat-captcha" />}
-      <form className="chat-form glass" onSubmit={handleSubmit}>
-        <input
+
+      <form className="chat-form" dir="rtl" onSubmit={handleSubmit}>
+        <textarea
+          ref={taRef}
           dir="auto"
+          rows={1}
           value={input}
           onChange={(event) => setInput(event.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="پیام بنویس..."
           aria-label="Message"
-          maxLength={500}
+          maxLength={MAX_LEN}
         />
-        <button type="submit" disabled={loading || !input.trim()}>Send</button>
+        <span className="cnt">{input.length}/{MAX_LEN}</span>
+        <button type="submit" className="snd" aria-label="Send" disabled={busy || !input.trim()}>
+          <SendIcon />
+        </button>
       </form>
     </section>
   );

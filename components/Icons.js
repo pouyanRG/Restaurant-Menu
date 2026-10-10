@@ -60,3 +60,11 @@ export const BagIcon = (p) => (
     <path d="M9.5 14.5c.6 1.2 1.4 1.8 2.5 1.8s1.9-.6 2.5-1.8" />
   </svg>
 );
+
+
+export const SendIcon = (p) => (
+  <svg viewBox="0 0 24 24" width="20" height="20" {...base} strokeWidth={2.2} {...p}>
+    <path d="M12 19V5" />
+    <path d="M5 12l7-7 7 7" />
+  </svg>
+);
