@@ -81,6 +81,8 @@ export default function ChatSection() {
       const data = await response.json().catch(() => ({}));
       const reply = response.status === 429
         ? "تعداد پیام‌ها زیاد است، کمی بعد دوباره تلاش کن."
+        : response.status === 504
+          ? "پاسخ دیر شد، دوباره تلاش کن."
         : response.ok
           ? data.reply
           : "خطا در دریافت پاسخ";

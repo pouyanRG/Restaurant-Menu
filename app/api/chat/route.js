@@ -3,6 +3,7 @@ import { Redis } from "@upstash/redis";
 import { products } from "@/data/products";
 
 export const runtime = "nodejs";
+export const maxDuration = 30;
 
 const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 const MAX_BODY = 8000;
@@ -175,9 +176,13 @@ export async function POST(request) {
         body: JSON.stringify({
           system_instruction: { parts: [{ text: SYSTEM }] },
           contents,
-          generationConfig: { maxOutputTokens: 800, temperature: 0.6 }
+          generationConfig: {
+            maxOutputTokens: 800,
+            temperature: 0.6,
+            thinkingConfig: { thinkingLevel: "minimal" }
+          }
         }),
-        signal: AbortSignal.timeout(15000)
+        signal: AbortSignal.timeout(30000)
       }
     );
     const data = await response.json();
@@ -193,6 +198,7 @@ export async function POST(request) {
     return json({ reply });
   } catch (error) {
     console.error("Gemini request failed:", error);
+    if (error?.name === "TimeoutError") return json({ error: "AI timeout" }, 504);
     return json({ error: "Server error" }, 500);
   }
 }
