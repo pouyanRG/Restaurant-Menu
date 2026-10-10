@@ -6,6 +6,7 @@ import SearchSection from "@/components/SearchSection";
 import CategoryHorizontalScroller from "@/components/CategoryHorizontalScroller";
 import ProductGrid from "@/components/ProductGrid";
 import CurvedBottomNavigation from "@/components/CurvedBottomNavigation";
+import ChatSection from "@/components/ChatSection";
 import { categories, products, navItems } from "@/data/products";
 import useFavs from "@/lib/useFavs";
 
@@ -57,6 +58,11 @@ export default function HomePage() {
           <>
             <HeaderBar onOpenLocation={openLocation} onOpenNotifications={openNotifications} />
             <ProductGrid products={favoriteProducts} liked={favs} onToggleLike={toggleFav} />
+          </>
+        ) : tab === "message" ? (
+          <>
+            <HeaderBar onOpenLocation={openLocation} onOpenNotifications={openNotifications} />
+            <ChatSection />
           </>
         ) : (
           <>

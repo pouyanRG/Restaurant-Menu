@@ -52,5 +52,12 @@ The home page composes the header, search and filter controls, category scroller
 
 ## Environment variables
 
+The chat API requires a Gemini API key and Upstash Redis credentials. Copy the variable names from `.env.example` into `.env.local`, then fill in the secret values. Never commit `.env.local` or expose API keys with a `NEXT_PUBLIC_` prefix.
 
-No environment variables are required for local development. Put local secrets in `.env.local`; do not commit secret values. Use `.env.example` to document required variable names without including credentials.
+- `GEMINI_API_KEY`: secret key from Google AI Studio.
+- `GEMINI_MODEL`: model name; defaults to `gemini-2.5-flash`.
+- `SITE_ORIGIN`: exact production origin, such as `https://example.com`; local development uses `http://localhost:3000`.
+- `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`: Upstash credentials. The API also accepts `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET`: optional Cloudflare Turnstile keys. If the secret is set, the widget site key must also be set.
+
+Create and connect an Upstash Redis database before using the chat. Add the same required variables to the Vercel project settings and redeploy after changing them. The Vercel deployment region is configured as Frankfurt (`fra1`).
