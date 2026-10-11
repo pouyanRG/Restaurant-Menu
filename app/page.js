@@ -50,24 +50,24 @@ export default function HomePage() {
       <div className="content">
         {tab === "home" ? (
           <>
-            <HeaderBar onOpenLocation={openLocation} onOpenNotifications={openNotifications} />
+            <HeaderBar showLocation onOpenLocation={openLocation} onOpenNotifications={openNotifications} />
             <SearchSection value={query} onChange={setQuery} onOpenFilters={openFilters} />
             <CategoryHorizontalScroller items={categories} active={category} onSelect={setCategory} />
             <ProductGrid products={visible} liked={favs} onToggleLike={toggleFav} />
           </>
         ) : tab === "favorite" ? (
           <>
-            <HeaderBar onOpenLocation={openLocation} onOpenNotifications={openNotifications} />
+            <HeaderBar showLocation={false} onBack={() => setTab("home")} onOpenNotifications={openNotifications} />
             <ProductGrid products={favoriteProducts} liked={favs} onToggleLike={toggleFav} />
           </>
         ) : tab === "message" ? (
           <>
-            <HeaderBar onOpenLocation={openLocation} onOpenNotifications={openNotifications} />
+            <HeaderBar showLocation={false} onBack={() => setTab("home")} onOpenNotifications={openNotifications} />
             <ChatSection onTypingChange={setTyping} />
           </>
         ) : (
           <>
-            <HeaderBar onOpenLocation={openLocation} onOpenNotifications={openNotifications} />
+            <HeaderBar showLocation={false} onBack={() => setTab("home")} onOpenNotifications={openNotifications} />
             <p className="empty">Coming soon</p>
           </>
         )}
