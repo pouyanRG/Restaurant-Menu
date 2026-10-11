@@ -146,11 +146,13 @@ export default function ChatSection() {
       const data = await response.json().catch(() => ({}));
       const reply = response.status === 429
         ? "تعداد پیام‌ها زیاد است، کمی بعد دوباره تلاش کن."
-        : response.status === 504
-          ? "پاسخ دیر شد، دوباره تلاش کن."
-        : response.ok
-          ? data.reply
-          : "خطا در دریافت پاسخ";
+        : response.status === 503
+          ? "سرویس چت موقتاً در دسترس نیست، کمی بعد امتحان کن."
+          : response.status === 504
+            ? "پاسخ دیر شد، دوباره تلاش کن."
+            : response.ok
+              ? data.reply
+              : "خطا در دریافت پاسخ";
       setMessages([...next, { role: "model", text: reply || "پاسخی دریافت نشد." }]);
       setShown(0);
       setTypingIndex(next.length);
