@@ -680,3 +680,36 @@ a.icon-btn { text-decoration: none; color: inherit; }
 
 /* ارتفاع لیست پیام‌ها: جا برای dock و نوار */
 .chat { height: calc(100dvh - 300px); }
+
+/* دکمه‌ی چت فعال */
+.nav-search.is-active { color: var(--green); }
+
+/* جلوگیری از زوم خودکار iOS هنگام فوکوس */
+.chat-form textarea { font-size: 16px; }
+
+/* نوبار با انیمیشن مخفی/ظاهر می‌شود */
+.bottom-wrap {
+  transition: transform .28s ease, opacity .2s ease, visibility 0s linear 0s;
+}
+
+/* فقط موبایل / تاچ */
+@media (pointer: coarse) {
+  .bottom-wrap.is-hidden {
+    transform: translate(-50%, calc(100% + 40px));
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform .28s ease, opacity .2s ease, visibility 0s linear .28s;
+  }
+
+  /* کادر پیام درست بالای کیبورد */
+  .chat-dock.is-typing {
+    bottom: calc(var(--kb, 0px) + 10px);
+    transition: bottom .15s ease;
+  }
+
+  /* لیست پیام‌ها با کوچک‌شدن صفحه جمع می‌شود */
+  .chat.is-typing {
+    height: calc(var(--vvh, 100dvh) - 250px);
+  }
+}

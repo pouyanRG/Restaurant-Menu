@@ -15,6 +15,7 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("home");
   const [toast, setToast] = useState("");
+  const [typing, setTyping] = useState(false);
   const timer = useRef(null);
 
   useEffect(() => {
@@ -32,10 +33,6 @@ export default function HomePage() {
   const openFilters = () => showToast("Filters coming soon");
   const openNotifications = () => showToast("Notifications coming soon");
   const openLocation = () => showToast("Location picker coming soon");
-  const openSearch = () => {
-    setTab("home");
-    setTimeout(() => document.getElementById("menu-search")?.focus(), 50);
-  };
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -66,7 +63,7 @@ export default function HomePage() {
         ) : tab === "message" ? (
           <>
             <HeaderBar onOpenLocation={openLocation} onOpenNotifications={openNotifications} />
-            <ChatSection />
+            <ChatSection onTypingChange={setTyping} />
           </>
         ) : (
           <>
@@ -78,7 +75,12 @@ export default function HomePage() {
       <div className={`toast${toast ? " show" : ""}`} role="status" aria-live="polite">
         {toast}
       </div>
-      <CurvedBottomNavigation items={navItems} active={tab} onSelect={setTab} onSearch={openSearch} />
+      <CurvedBottomNavigation
+        items={navItems}
+        active={tab}
+        onSelect={setTab}
+        hidden={tab === "message" && typing}
+      />
     </AppLayout>
   );
 }

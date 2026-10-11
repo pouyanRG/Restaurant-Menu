@@ -105,7 +105,6 @@ export const getProduct = (id) => products.find((p) => p.id === Number(id));
 
 export const navItems = [
   { id: "home", label: "Home" },
-  { id: "message", label: "Message" },
   { id: "favorite", label: "Favorite" },
   { id: "profile", label: "Profile" }
 ];

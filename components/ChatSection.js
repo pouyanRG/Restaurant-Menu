@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, SendIcon } from "./Icons";
 import { products } from "@/data/products";
+import useKeyboardInset from "@/lib/useKeyboardInset";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const QUICK = ["ارزون‌ترین غذا چیه؟", "What's the best pizza?", "یه چیز سبک"];
@@ -39,7 +40,13 @@ function MiniCard({ product }) {
   );
 }
 
-export default function ChatSection() {
+export default function ChatSection({ onTypingChange }) {
+  const [typing, setTyping] = useState(false);
+  useKeyboardInset(typing);
+
+  useEffect(() => { onTypingChange?.(typing); }, [typing, onTypingChange]);
+  useEffect(() => () => onTypingChange?.(false), [onTypingChange]);
+
   const [messages, setMessages] = useState([
     { role: "model", text: "سلام! درباره منو هر سوالی داری بپرس" }
   ]);
@@ -182,7 +189,7 @@ export default function ChatSection() {
   }
 
   return (
-    <section className="chat" aria-label="Chat">
+    <section className={`chat${typing ? " is-typing" : ""}`} aria-label="Chat">
       <div className="chat-list" dir="rtl" role="log" aria-live="polite">
         {messages.map((message, index) => {
           const isTyping = index === typingIndex;
@@ -208,10 +215,10 @@ export default function ChatSection() {
         )}
         <div ref={endRef} />
       </div>
-      <div className="chat-dock">
+      <div className={`chat-dock${typing ? " is-typing" : ""}`}>
         <div className="chat-quick">
           {QUICK.map((question) => (
-            <button key={question} type="button" className="chip" onClick={() => send(question)} disabled={busy}>
+            <button key={question} type="button" className="chip" onMouseDown={(event) => event.preventDefault()} onClick={() => send(question)} disabled={busy}>
               {question}
             </button>
           ))}
@@ -227,12 +234,14 @@ export default function ChatSection() {
             value={input}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={handleKeyDown}
+            onFocus={() => setTyping(true)}
+            onBlur={() => setTyping(false)}
             placeholder="پیام بنویس..."
             aria-label="Message"
             maxLength={MAX_LEN}
           />
           <span className="cnt">{input.length}/{MAX_LEN}</span>
-          <button type="submit" className="snd" aria-label="Send" disabled={busy || !input.trim()}>
+          <button type="submit" className="snd" aria-label="Send" onMouseDown={(event) => event.preventDefault()} disabled={busy || !input.trim()}>
             <SendIcon />
           </button>
         </form>
