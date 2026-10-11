@@ -704,7 +704,7 @@ a.icon-btn { text-decoration: none; color: inherit; }
 
   /* کادر پیام درست بالای کیبورد */
   .chat-dock.is-typing {
-    bottom: calc(var(--kb, 0px) + 10px);
+    bottom: calc(var(--kb, 0px) + 12px);
     transition: bottom .15s ease;
   }
 
@@ -713,3 +713,6 @@ a.icon-btn { text-decoration: none; color: inherit; }
     height: calc(var(--vvh, 100dvh) - 250px);
   }
 }
+
+.chat-dock { padding-bottom: 2px; }
+.chat-form { margin-bottom: 2px; }
