@@ -6,7 +6,7 @@ import { products } from "@/data/products";
 import useKeyboardInset from "@/lib/useKeyboardInset";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-const QUICK = ["ارزون‌ترین غذا چیه؟", "What's the best pizza?", "یه چیز سبک"];
+const QUICK = ["What's the most popular dish?", "What do you recommend?","What's the best pizza?","What are the vegan options?","What's your best dessert?","What can I get under $10?"];
 const MAX_LEN = 500;
 
 // اسم غذاهای ذکرشده در جواب بات را پیدا می‌کند تا کارت نشان بدهیم
@@ -48,7 +48,7 @@ export default function ChatSection({ onTypingChange }) {
   useEffect(() => () => onTypingChange?.(false), [onTypingChange]);
 
   const [messages, setMessages] = useState([
-    { role: "model", text: "سلام! درباره منو هر سوالی داری بپرس" }
+    { role: "model", text: "Hi" }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -218,7 +218,7 @@ export default function ChatSection({ onTypingChange }) {
       <div className={`chat-dock${typing ? " is-typing" : ""}`}>
         <div className="chat-quick">
           {QUICK.map((question) => (
-            <button key={question} type="button" className="chip" onMouseDown={(event) => event.preventDefault()} onClick={() => send(question)} disabled={busy}>
+            <button key={question} type="button" className="chip" dir="auto" onMouseDown={(event) => event.preventDefault()} onClick={() => send(question)} disabled={busy}>
               {question}
             </button>
           ))}
@@ -236,7 +236,7 @@ export default function ChatSection({ onTypingChange }) {
             onKeyDown={handleKeyDown}
             onFocus={() => setTyping(true)}
             onBlur={() => setTyping(false)}
-            placeholder="پیام بنویس..."
+            placeholder="Ask ai menu..."
             aria-label="Message"
             maxLength={MAX_LEN}
           />

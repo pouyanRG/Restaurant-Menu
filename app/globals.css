@@ -527,7 +527,7 @@ a.icon-btn { text-decoration: none; color: inherit; }
 
 
 /* quick chips */
-.chat-quick { display: flex; gap: 8px; padding: 2px 0 4px; direction: rtl; overflow-x: auto; scrollbar-width: none; }
+.chat-quick { display: flex; gap: 8px; padding: 2px 0 4px; direction: ltr; overflow-x: auto; scrollbar-width: none; }
 .chat-quick::-webkit-scrollbar { display: none; }
 .chat-quick .chip {
   flex: none; min-height: 0; font-size: 12px; padding: 8px 13px; border-radius: 99px;
@@ -544,10 +544,6 @@ a.icon-btn { text-decoration: none; color: inherit; }
   border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
   transition: border-color 0.15s, box-shadow 0.15s;
-}
-.chat-form:focus-within {
-  border-color: #19b44b;
-  box-shadow: 0 0 0 4px rgba(25, 180, 75, 0.15), 0 8px 20px rgba(0, 0, 0, 0.06);
 }
 .chat-form textarea {
   flex: 1; min-width: 0; max-height: 120px; resize: none; overflow-y: auto;
@@ -590,7 +586,7 @@ a.icon-btn { text-decoration: none; color: inherit; }
 /* ============ Slack-style bottom: nav pill + search circle + floating composer ============ */
 :root {
   --side: 16px;
-  --nav-h: 62px;
+  --nav-h: 52px;
   --nav-bottom: 16px;
   --dock-gap: 10px;
   --dock-w: min(calc(100% - var(--side) * 2), calc(var(--app-w) - var(--side) * 2));
@@ -625,8 +621,10 @@ a.icon-btn { text-decoration: none; color: inherit; }
   border-radius: 9999px;
 }
 .nav-item.is-active::before { inset: 0; border-radius: 9999px; }
-.nav-ic { height: 28px; }
-.nav-label { font-size: 12px; }
+.nav-ic { height: 24px; }
+.nav-ic svg { width: 20px; height: 20px; }
+.nav-label { font-size: 10.5px; }
+.nav-avatar { width: 24px; height: 24px; }
 
 .nav-search {
   position: relative;
@@ -646,6 +644,7 @@ a.icon-btn { text-decoration: none; color: inherit; }
     0 14px 30px rgba(70,90,120,.18),
     0 3px 8px rgba(70,90,120,.10);
 }
+.nav-search svg { width: 22px; height: 22px; }
 
 /* کادر پیام: شناور، درست بالای نوار */
 .chat-dock {
@@ -677,6 +676,7 @@ a.icon-btn { text-decoration: none; color: inherit; }
 .chat-form textarea { padding: 6px 0; font-size: 15px; }
 .cnt { padding-bottom: 0; }
 .snd { width: 38px; height: 38px; }
+.chat-form .snd { order: -1; }
 
 /* ارتفاع لیست پیام‌ها: جا برای dock و نوار */
 .chat { height: calc(100dvh - 300px); }
