@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export const maxDuration = 30;
 
 const MODELS = [
-  process.env.GEMINI_MODEL || "gemini-2.5-flash-lite",
+  process.env.GEMINI_MODEL || "gemini-3.5-flash-lite",
   process.env.GEMINI_FALLBACK_MODEL
 ].filter((model, index, models) => model && models.indexOf(model) === index);
 

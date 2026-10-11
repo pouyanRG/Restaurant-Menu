@@ -208,9 +208,6 @@ export default function ChatSection() {
         )}
         <div ref={endRef} />
       </div>
-
-      <p className="chat-privacy" dir="auto">برای پاسخ‌گویی، پیام‌ها به Google ارسال می‌شوند؛ اطلاعات شخصی ننویس.</p>
-
       <div className="chat-quick">
         {QUICK.map((question) => (
           <button key={question} type="button" className="chip" onClick={() => send(question)} disabled={busy}>

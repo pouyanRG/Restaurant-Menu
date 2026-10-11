@@ -525,7 +525,6 @@ a.icon-btn { text-decoration: none; color: inherit; }
 .mc-go { width: 28px; height: 28px; border-radius: 50%; background: #111; color: #cfee3a; display: grid; place-items: center; flex: none; }
 .mc-go svg { width: 15px; height: 15px; }
 
-.chat-privacy { color: var(--muted); font-size: 11px; line-height: 1.5; }
 
 /* quick chips */
 .chat-quick { display: flex; gap: 8px; padding: 2px 0 4px; direction: rtl; overflow-x: auto; scrollbar-width: none; }
