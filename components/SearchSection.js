@@ -6,6 +6,7 @@ export default function SearchSection({ value, onChange, onOpenFilters }) {
     <div className="search glass">
       <SearchIcon className="search-lead" />
       <input
+        id="menu-search"
         type="search"
         placeholder="Search..."
         value={value}

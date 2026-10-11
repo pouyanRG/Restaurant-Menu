@@ -208,33 +208,35 @@ export default function ChatSection() {
         )}
         <div ref={endRef} />
       </div>
-      <div className="chat-quick">
-        {QUICK.map((question) => (
-          <button key={question} type="button" className="chip" onClick={() => send(question)} disabled={busy}>
-            {question}
+      <div className="chat-dock">
+        <div className="chat-quick">
+          {QUICK.map((question) => (
+            <button key={question} type="button" className="chip" onClick={() => send(question)} disabled={busy}>
+              {question}
+            </button>
+          ))}
+        </div>
+
+        {SITE_KEY && <div ref={widgetBox} className="chat-captcha" />}
+
+        <form className="chat-form" dir="rtl" onSubmit={handleSubmit}>
+          <textarea
+            ref={taRef}
+            dir="auto"
+            rows={1}
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="پیام بنویس..."
+            aria-label="Message"
+            maxLength={MAX_LEN}
+          />
+          <span className="cnt">{input.length}/{MAX_LEN}</span>
+          <button type="submit" className="snd" aria-label="Send" disabled={busy || !input.trim()}>
+            <SendIcon />
           </button>
-        ))}
+        </form>
       </div>
-
-      {SITE_KEY && <div ref={widgetBox} className="chat-captcha" />}
-
-      <form className="chat-form" dir="rtl" onSubmit={handleSubmit}>
-        <textarea
-          ref={taRef}
-          dir="auto"
-          rows={1}
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="پیام بنویس..."
-          aria-label="Message"
-          maxLength={MAX_LEN}
-        />
-        <span className="cnt">{input.length}/{MAX_LEN}</span>
-        <button type="submit" className="snd" aria-label="Send" disabled={busy || !input.trim()}>
-          <SendIcon />
-        </button>
-      </form>
     </section>
   );
 }
