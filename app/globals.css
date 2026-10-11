@@ -586,7 +586,7 @@ a.icon-btn { text-decoration: none; color: inherit; }
 /* ============ Slack-style bottom: nav pill + search circle + floating composer ============ */
 :root {
   --side: 16px;
-  --nav-h: 52px;
+  --nav-h: 54px;
   --nav-bottom: 16px;
   --dock-gap: 10px;
   --dock-w: min(calc(100% - var(--side) * 2), calc(var(--app-w) - var(--side) * 2));
@@ -616,15 +616,15 @@ a.icon-btn { text-decoration: none; color: inherit; }
   max-width: none;
   height: 100%;
   padding: 0;
-  gap: 2px;
+  gap: 1px;
   justify-content: center;
   border-radius: 9999px;
 }
 .nav-item.is-active::before { inset: 0; border-radius: 9999px; }
-.nav-ic { height: 24px; }
-.nav-ic svg { width: 20px; height: 20px; }
-.nav-label { font-size: 10.5px; }
-.nav-avatar { width: 24px; height: 24px; }
+.nav-ic { height: 25px; }
+.nav-ic svg { width: 21px; height: 21px; }
+.nav-avatar { width: 25px; height: 25px; }
+.nav-label { font-size: 11px; }
 
 .nav-search {
   position: relative;
@@ -644,7 +644,6 @@ a.icon-btn { text-decoration: none; color: inherit; }
     0 14px 30px rgba(70,90,120,.18),
     0 3px 8px rgba(70,90,120,.10);
 }
-.nav-search svg { width: 22px; height: 22px; }
 
 /* کادر پیام: شناور، درست بالای نوار */
 .chat-dock {

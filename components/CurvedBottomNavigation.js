@@ -28,7 +28,7 @@ export default function CurvedBottomNavigation({ items, active, onSelect, hidden
         aria-pressed={active === "message"}
         onClick={() => onSelect("message")}
       >
-        <MessageIcon width="26" height="26" />
+        <MessageIcon width="23" height="23" />
       </button>
     </div>
   );
