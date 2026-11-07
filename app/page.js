@@ -15,7 +15,6 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("home");
   const [toast, setToast] = useState("");
-  const [typing, setTyping] = useState(false);
   const timer = useRef(null);
 
   useEffect(() => {
@@ -63,7 +62,7 @@ export default function HomePage() {
         ) : tab === "message" ? (
           <>
             <HeaderBar showLocation={false} onBack={() => setTab("home")} onOpenNotifications={openNotifications} />
-            <ChatSection onTypingChange={setTyping} />
+            <ChatSection />
           </>
         ) : (
           <>
@@ -75,12 +74,9 @@ export default function HomePage() {
       <div className={`toast${toast ? " show" : ""}`} role="status" aria-live="polite">
         {toast}
       </div>
-      <CurvedBottomNavigation
-        items={navItems}
-        active={tab}
-        onSelect={setTab}
-        hidden={tab === "message" && typing}
-      />
+      {tab !== "message" && (
+        <CurvedBottomNavigation items={navItems} active={tab} onSelect={setTab} />
+      )}
     </AppLayout>
   );
 }

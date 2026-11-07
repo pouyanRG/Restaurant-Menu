@@ -40,12 +40,9 @@ function MiniCard({ product }) {
   );
 }
 
-export default function ChatSection({ onTypingChange }) {
+export default function ChatSection() {
   const [typing, setTyping] = useState(false);
   useKeyboardInset(typing);
-
-  useEffect(() => { onTypingChange?.(typing); }, [typing, onTypingChange]);
-  useEffect(() => () => onTypingChange?.(false), [onTypingChange]);
 
   const [messages, setMessages] = useState([
     { role: "model", text: "Hi" }
@@ -216,7 +213,7 @@ export default function ChatSection({ onTypingChange }) {
         <div ref={endRef} />
       </div>
       <div className={`chat-dock${typing ? " is-typing" : ""}`}>
-        <div className="chat-quick">
+        <div className="chat-quick" role="group" aria-label="Suggested questions">
           {QUICK.map((question) => (
             <button key={question} type="button" className="chip" dir="auto" onMouseDown={(event) => event.preventDefault()} onClick={() => send(question)} disabled={busy}>
               {question}
@@ -238,9 +235,10 @@ export default function ChatSection({ onTypingChange }) {
             onBlur={() => setTyping(false)}
             placeholder="Ask ai menu..."
             aria-label="Message"
+            aria-describedby="chat-message-count"
             maxLength={MAX_LEN}
           />
-          <span className="cnt">{input.length}/{MAX_LEN}</span>
+          <span id="chat-message-count" className="cnt">{input.length}/{MAX_LEN}</span>
           <button type="submit" className="snd" aria-label="Send" onMouseDown={(event) => event.preventDefault()} disabled={busy || !input.trim()}>
             <SendIcon />
           </button>

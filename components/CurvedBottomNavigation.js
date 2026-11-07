@@ -13,9 +13,9 @@ function Item({ id, label, active, onSelect }) {
   );
 }
 
-export default function CurvedBottomNavigation({ items, active, onSelect, hidden }) {
+export default function CurvedBottomNavigation({ items, active, onSelect }) {
   return (
-    <div className={`bottom-wrap${hidden ? " is-hidden" : ""}`}>
+    <div className="bottom-wrap">
       <nav className="bottom-nav" aria-label="Main navigation">
         {items.map((i) => (
           <Item key={i.id} {...i} active={active === i.id} onSelect={onSelect} />
