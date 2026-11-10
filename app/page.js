@@ -1,13 +1,15 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppLayout from "@/components/AppLayout";
 import HeaderBar from "@/components/HeaderBar";
+import NotificationPanel from "@/components/NotificationPanel";
 import SearchSection from "@/components/SearchSection";
 import CategoryHorizontalScroller from "@/components/CategoryHorizontalScroller";
 import ProductGrid from "@/components/ProductGrid";
 import CurvedBottomNavigation from "@/components/CurvedBottomNavigation";
 import ChatSection from "@/components/ChatSection";
 import { categories, products, navItems } from "@/data/products";
+import { initialNotifications } from "@/data/notifications";
 import useFavs from "@/lib/useFavs";
 
 export default function HomePage() {
@@ -15,6 +17,8 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("home");
   const [toast, setToast] = useState("");
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState(initialNotifications);
   const timer = useRef(null);
 
   useEffect(() => {
@@ -30,7 +34,11 @@ export default function HomePage() {
   const [favs, toggleFav] = useFavs();
 
   const openFilters = () => showToast("Filters coming soon");
-  const openNotifications = () => showToast("Notifications coming soon");
+  const openNotifications = () => setNotifOpen(true);
+  const closeNotifications = useCallback(() => setNotifOpen(false), []);
+  const markAllRead = () => setNotifications((list) => list.map((item) => ({ ...item, read: true })));
+  const markOneRead = (id) =>
+    setNotifications((list) => list.map((item) => (item.id === id ? { ...item, read: true } : item)));
   const openLocation = () => showToast("Location picker coming soon");
 
   const visible = useMemo(() => {
@@ -76,6 +84,14 @@ export default function HomePage() {
       </div>
       {tab !== "message" && (
         <CurvedBottomNavigation items={navItems} active={tab} onSelect={setTab} />
+      )}
+      {notifOpen && (
+        <NotificationPanel
+          items={notifications}
+          onClose={closeNotifications}
+          onMarkAllRead={markAllRead}
+          onItemClick={markOneRead}
+        />
       )}
     </AppLayout>
   );

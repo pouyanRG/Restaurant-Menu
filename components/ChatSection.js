@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, SendIcon } from "./Icons";
+import { ChevronRight, PlusIcon, SendIcon } from "./Icons";
 import { products } from "@/data/products";
 import useKeyboardInset from "@/lib/useKeyboardInset";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const QUICK = ["What's the most popular dish?", "What do you recommend?","What's the best pizza?","What are the vegan options?","What's your best dessert?","What can I get under $10?"];
 const MAX_LEN = 500;
+const MAX_TEXTAREA_HEIGHT = 136;
 
 // اسم غذاهای ذکرشده در جواب بات را پیدا می‌کند تا کارت نشان بدهیم
 function findMentioned(text) {
@@ -85,7 +86,8 @@ export default function ChatSection() {
     const el = taRef.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = Math.min(el.scrollHeight, 120) + "px";
+    el.style.height = Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT) + "px";
+    el.style.overflowY = el.scrollHeight > MAX_TEXTAREA_HEIGHT ? "auto" : "hidden";
   }, [input]);
 
   useEffect(() => {
@@ -178,12 +180,7 @@ export default function ChatSection() {
     send(input);
   }
 
-  function handleKeyDown(event) {
-    if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
-      event.preventDefault();
-      send(input);
-    }
-  }
+  const inputUsesArabicScript = /\p{Script=Arabic}/u.test(input);
 
   return (
     <section className={`chat${typing ? " is-typing" : ""}`} aria-label="Chat">
@@ -192,9 +189,10 @@ export default function ChatSection() {
           const isTyping = index === typingIndex;
           const text = isTyping ? Array.from(message.text).slice(0, shown).join("") : message.text;
           const cards = message.role === "model" && index > 0 && !isTyping ? findMentioned(message.text) : [];
+          const usesPersianFont = /\p{Script=Arabic}/u.test(text);
           return (
             <div key={index} className="chat-row">
-              <div dir="auto" className={`bubble ${message.role === "user" ? "me" : "bot"}`}>
+              <div dir="auto" className={`bubble ${message.role === "user" ? "me" : "bot"} ${usesPersianFont ? "is-persian" : "is-english"}`}>
                 {text}
               </div>
               {cards.length > 0 && (
@@ -213,33 +211,42 @@ export default function ChatSection() {
         <div ref={endRef} />
       </div>
       <div className={`chat-dock${typing ? " is-typing" : ""}`}>
-        <div className="chat-quick" role="group" aria-label="Suggested questions">
-          {QUICK.map((question) => (
-            <button key={question} type="button" className="chip" dir="auto" onMouseDown={(event) => event.preventDefault()} onClick={() => send(question)} disabled={busy}>
-              {question}
-            </button>
-          ))}
-        </div>
+        {!messages.some((message) => message.role === "user") && (
+          <div className="chat-quick" role="group" aria-label="Suggested questions">
+            {QUICK.map((question) => (
+              <button key={question} type="button" className="chip" dir="auto" onMouseDown={(event) => event.preventDefault()} onClick={() => send(question)} aria-disabled={busy}>
+                {question}
+              </button>
+            ))}
+          </div>
+        )}
 
         {SITE_KEY && <div ref={widgetBox} className="chat-captcha" />}
 
-        <form className="chat-form" dir="rtl" onSubmit={handleSubmit}>
+        <form className={`chat-form${input.includes("\n") ? " is-expanded" : ""}`} dir="rtl" onSubmit={handleSubmit}>
+          <span className="composer-icon composer-plus" aria-hidden="true"><PlusIcon /></span>
           <textarea
             ref={taRef}
+            className={inputUsesArabicScript ? "is-persian" : "is-english"}
             dir="auto"
             rows={1}
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            onKeyDown={handleKeyDown}
             onFocus={() => setTyping(true)}
             onBlur={() => setTyping(false)}
-            placeholder="Ask ai menu..."
+            placeholder="Ask ai ..."
             aria-label="Message"
             aria-describedby="chat-message-count"
             maxLength={MAX_LEN}
           />
           <span id="chat-message-count" className="cnt">{input.length}/{MAX_LEN}</span>
-          <button type="submit" className="snd" aria-label="Send" onMouseDown={(event) => event.preventDefault()} disabled={busy || !input.trim()}>
+          <span className="composer-icon composer-mic" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="3" width="6" height="12" rx="3" />
+              <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6" />
+            </svg>
+          </span>
+          <button type="submit" className={`snd${input.trim() ? " is-ready" : ""}`} aria-label="Send" onMouseDown={(event) => event.preventDefault()} aria-disabled={busy || !input.trim()}>
             <SendIcon />
           </button>
         </form>
