@@ -49,9 +49,9 @@
     "semantic_hash": "b3956a3c32819f4b6e6c41309d55d716"
   },
   "components/ChatSection.js": {
-    "mtime": 1794351798.6924148,
-    "seen": 1794351812.3161652,
-    "ast_hash": "d5c00b2c4f7a26df3e6a33ca7d4f2806",
+    "mtime": 1794407477.3728657,
+    "seen": 1794407496.0455678,
+    "ast_hash": "31dbd084d7c10989e5efcf46566d9f31",
     "semantic_hash": ""
   },
   "components/CurvedBottomNavigation.js": {
@@ -310,6 +310,24 @@
     "mtime": 1791382222.5767717,
     "seen": 1794347938.0831242,
     "ast_hash": "d77b665ddc809c40632441070a0cbc9e",
+    "semantic_hash": ""
+  },
+  "20261111-1402-01.6736953.mp4": {
+    "mtime": 1794405730.5563502,
+    "seen": 1794406485.4060662,
+    "ast_hash": "8c742bc2fdd0d546f5d2bb97ba935ee4",
+    "semantic_hash": ""
+  },
+  "public/screen-recording-inspect.mp4": {
+    "mtime": 1794405294.2871144,
+    "seen": 1794406485.4060683,
+    "ast_hash": "59fd137f95ff5893d69d8a239b570bc5",
+    "semantic_hash": ""
+  },
+  "screen-recording-inspect.mp4": {
+    "mtime": 1794405294.2871144,
+    "seen": 1794406485.40607,
+    "ast_hash": "59fd137f95ff5893d69d8a239b570bc5",
     "semantic_hash": ""
   },
   "package-lock.json": {

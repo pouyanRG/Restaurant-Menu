@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, PlusIcon, SendIcon } from "./Icons";
 import { products } from "@/data/products";
@@ -8,7 +8,10 @@ import useKeyboardInset from "@/lib/useKeyboardInset";
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const QUICK = ["What's the most popular dish?", "What do you recommend?","What's the best pizza?","What are the vegan options?","What's your best dessert?","What can I get under $10?"];
 const MAX_LEN = 500;
+const MIN_TEXTAREA_HEIGHT = 36;
 const MAX_TEXTAREA_HEIGHT = 136;
+const COMPACT_COMPOSER_HEIGHT = 54;
+const COMPOSER_CONTROLS_HEIGHT = 62;
 
 // اسم غذاهای ذکرشده در جواب بات را پیدا می‌کند تا کارت نشان بدهیم
 function findMentioned(text) {
@@ -43,6 +46,8 @@ function MiniCard({ product }) {
 
 export default function ChatSection() {
   const [typing, setTyping] = useState(false);
+  const [composerExpanded, setComposerExpanded] = useState(false);
+  const [composerHeight, setComposerHeight] = useState(COMPACT_COMPOSER_HEIGHT);
   useKeyboardInset(typing);
 
   const [messages, setMessages] = useState([
@@ -81,13 +86,37 @@ export default function ChatSection() {
     return () => clearInterval(id);
   }, [typingIndex, messages]);
 
-  // تکست‌اریا با تایپ بزرگ می‌شود
-  useEffect(() => {
+  // Measure in the expanded layout so wrapping does not change the mode after it expands.
+  useLayoutEffect(() => {
     const el = taRef.current;
     if (!el) return;
-    el.style.height = "auto";
-    el.style.height = Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT) + "px";
-    el.style.overflowY = el.scrollHeight > MAX_TEXTAREA_HEIGHT ? "auto" : "hidden";
+    const form = el.form;
+    const wasExpanded = form.classList.contains("is-expanded");
+    form.classList.add("is-expanded");
+    const textareaStyle = getComputedStyle(el);
+    const singleLineHeight = Number.parseFloat(textareaStyle.lineHeight)
+      + Number.parseFloat(textareaStyle.paddingTop)
+      + Number.parseFloat(textareaStyle.paddingBottom);
+    const previousHeight = el.style.height;
+    const previousMinHeight = el.style.minHeight;
+    el.style.height = "0px";
+    el.style.minHeight = "0px";
+    const contentHeight = el.scrollHeight;
+    el.style.height = previousHeight;
+    el.style.minHeight = previousMinHeight;
+    if (!wasExpanded) form.classList.remove("is-expanded");
+
+    const expanded = contentHeight > singleLineHeight + 1;
+    const textareaHeight = expanded
+      ? Math.min(Math.max(contentHeight, MIN_TEXTAREA_HEIGHT), MAX_TEXTAREA_HEIGHT)
+      : MIN_TEXTAREA_HEIGHT;
+    const height = expanded
+      ? textareaHeight + COMPOSER_CONTROLS_HEIGHT
+      : COMPACT_COMPOSER_HEIGHT;
+
+    el.style.overflowY = contentHeight > MAX_TEXTAREA_HEIGHT ? "auto" : "hidden";
+    setComposerExpanded(expanded);
+    setComposerHeight(height);
   }, [input]);
 
   useEffect(() => {
@@ -223,7 +252,7 @@ export default function ChatSection() {
 
         {SITE_KEY && <div ref={widgetBox} className="chat-captcha" />}
 
-        <form className={`chat-form${input.includes("\n") ? " is-expanded" : ""}`} dir="rtl" onSubmit={handleSubmit}>
+        <form className={`chat-form${composerExpanded ? " is-expanded" : ""}`} dir="rtl" style={{ height: composerHeight }} onSubmit={handleSubmit}>
           <span className="composer-icon composer-plus" aria-hidden="true"><PlusIcon /></span>
           <textarea
             ref={taRef}
