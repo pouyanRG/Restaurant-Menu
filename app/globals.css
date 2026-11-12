@@ -977,3 +977,49 @@ a.icon-btn { text-decoration: none; color: inherit; }
   -webkit-mask-image: linear-gradient(#000 calc(100% - 18px), transparent 100%);
   mask-image: linear-gradient(#000 calc(100% - 18px), transparent 100%);
 }
+
+/* ===== یکدست‌سازی رنگ هدر ===== */
+:root {
+  --glass-soft: rgba(228, 241, 178, 0.55);
+  --lime: #dcebb0; /* به‌جای #cfee3a */
+}
+
+.location-pin,
+.location-text,
+.menu-header .location-text,
+.menu-header .search,
+.menu-header .header-row .icon-btn {
+  background: var(--glass-soft);
+}
+
+.chip.is-active { background: rgba(220, 235, 176, 0.7); }
+.details-chips span { background: rgba(220, 235, 176, 0.6); }
+
+/* پس‌زمینهٔ پشت هدر هم‌رنگ بالای اپ */
+.menu-header::before {
+  background: linear-gradient(
+    180deg,
+    rgba(238, 247, 201, 0.97) 0%,
+    rgba(222, 243, 224, 0.96) 100%
+  );
+}
+
+/* ===== پس‌زمینهٔ ملایم‌تر ===== */
+.app {
+  background:
+    radial-gradient(60% 28% at 10% 0%, #ecf6b8 0%, rgba(236, 246, 184, 0) 72%),
+    radial-gradient(70% 30% at 100% 22%, #d6f2b8 0%, rgba(214, 242, 184, 0) 70%),
+    radial-gradient(80% 30% at 0% 60%, #d3f1ec 0%, rgba(211, 241, 236, 0) 70%),
+    linear-gradient(180deg, #eef7c9 0%, #dcf3dc 17%, #d6eff0 42%, #e2f3f5 75%, #ebf6f6 100%);
+}
+
+/* ===== کارت‌ها: ته گرادیان کم‌اشباع‌تر ===== */
+.theme-yellow { background: linear-gradient(135deg, #fffdf1 0%, #fbf3c9 55%, #f3e196 100%); }
+.theme-orange { background: linear-gradient(135deg, #fff6f1 0%, #fde9dc 50%, #f5c3a0 100%); }
+.theme-peach  { background: linear-gradient(135deg, #fff7f3 0%, #fdeadf 50%, #f6cbab 100%); }
+.theme-green  { background: linear-gradient(135deg, #f6fff2 0%, #d9f6c3 50%, #bfeaa4 100%); }
+.theme-red    { background: linear-gradient(135deg, #fff7f7 0%, #ffe1e4 50%, #f7a3ad 100%); }
+.theme-blue   { background: linear-gradient(135deg, #f4fcff 0%, #cfeef8 55%, #a6dcee 100%); }
+
+/* بج تخفیف: کمی سفید، تا زرد/نارنجی کارت را بلند نکند */
+.badge-off { background: rgba(255, 255, 255, 0.30); }
