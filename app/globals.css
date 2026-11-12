@@ -133,9 +133,9 @@ html.glass-refract .header-bar .icon-btn {
 .chip {
   flex: none; scroll-snap-align: start; min-height: 40px; padding: 0 13px;
   font-size: 14px; color: #1b1b1b; border-radius: 8px; border-bottom: 2px solid transparent;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.2s, border-color 0.2s;background: rgba(207, 238, 58, 0.55);
 }
-.chip.is-active { background: rgba(207, 238, 58, 0.55); border-bottom-color: var(--ink); font-weight: 500; }
+.chip.is-active { background: rgba(208, 238, 58, 0.636); border-bottom-color: var(--ink); font-weight: 500; }
 
 /* ============ Product grid ============ */
 .grid { margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -756,7 +756,7 @@ a.icon-btn { text-decoration: none; color: inherit; }
   height: 54px;
   padding: 8px;
   padding-inline: 8px;
-  border-radius: 28px;
+  border-radius: 22px;
   display: grid;
   grid-template-columns: 36px minmax(0, 1fr) 36px 40px;
   grid-template-rows: 36px;
