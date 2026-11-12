@@ -54,12 +54,18 @@ export default function HomePage() {
 
   return (
     <AppLayout>
-      <div className="content">
+      <div className={`content${tab === "home" ? " menu-content" : ""}`}>
         {tab === "home" ? (
           <>
-            <HeaderBar showLocation onOpenLocation={openLocation} onOpenNotifications={openNotifications} />
-            <SearchSection value={query} onChange={setQuery} onOpenFilters={openFilters} />
-            <CategoryHorizontalScroller items={categories} active={category} onSelect={setCategory} />
+            <HeaderBar
+              menu
+              showLocation
+              onOpenLocation={openLocation}
+              onOpenNotifications={openNotifications}
+            >
+              <SearchSection value={query} onChange={setQuery} onOpenFilters={openFilters} />
+              <CategoryHorizontalScroller items={categories} active={category} onSelect={setCategory} />
+            </HeaderBar>
             <ProductGrid products={visible} liked={favs} onToggleLike={toggleFav} />
           </>
         ) : tab === "favorite" ? (

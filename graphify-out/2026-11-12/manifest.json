@@ -1,0 +1,327 @@
+{
+  ".github/workflows/npm-publish.yml": {
+    "mtime": 1791215881.2163608,
+    "seen": 1794073763.5668204,
+    "ast_hash": "18fbbedf93566d3bb97e42e5b5b78910",
+    "semantic_hash": "18fbbedf93566d3bb97e42e5b5b78910"
+  },
+  ".vscode/tasks.json": {
+    "mtime": 1791709470.629807,
+    "seen": 1794073763.5670567,
+    "ast_hash": "fe1bf13c2a6d17371aeb0d25db040a6c",
+    "semantic_hash": "fe1bf13c2a6d17371aeb0d25db040a6c",
+    "ast_empty": true
+  },
+  "app/api/chat/route.js": {
+    "mtime": 1791707435.9783676,
+    "seen": 1794073763.5670602,
+    "ast_hash": "3d5376a0a62275efbea15449f07ad64f",
+    "semantic_hash": "3d5376a0a62275efbea15449f07ad64f"
+  },
+  "app/food/[id]/page.js": {
+    "mtime": 1791644563.664572,
+    "seen": 1794073763.5671785,
+    "ast_hash": "aba5ae715f84f39516b4205715e010dd",
+    "semantic_hash": "aba5ae715f84f39516b4205715e010dd"
+  },
+  "app/layout.js": {
+    "mtime": 1791710031.1265366,
+    "seen": 1794073763.56729,
+    "ast_hash": "4492abee1faf0d4f0c6f29a39fda8b7f",
+    "semantic_hash": "4492abee1faf0d4f0c6f29a39fda8b7f"
+  },
+  "app/page.js": {
+    "mtime": 1794498603.7967138,
+    "seen": 1794498629.336496,
+    "ast_hash": "95ababfcf1179451b25d6a6f3ea69a0e",
+    "semantic_hash": ""
+  },
+  "components/AppLayout.js": {
+    "mtime": 1791381862.5308504,
+    "seen": 1794073763.5674489,
+    "ast_hash": "5b075c89a334a350c33c08469510eb89",
+    "semantic_hash": "5b075c89a334a350c33c08469510eb89"
+  },
+  "components/CategoryHorizontalScroller.js": {
+    "mtime": 1791208217.0,
+    "seen": 1794073763.5675292,
+    "ast_hash": "b3956a3c32819f4b6e6c41309d55d716",
+    "semantic_hash": "b3956a3c32819f4b6e6c41309d55d716"
+  },
+  "components/ChatSection.js": {
+    "mtime": 1794407477.3728657,
+    "seen": 1794407496.0455678,
+    "ast_hash": "31dbd084d7c10989e5efcf46566d9f31",
+    "semantic_hash": ""
+  },
+  "components/CurvedBottomNavigation.js": {
+    "mtime": 1794051697.5301814,
+    "seen": 1794073763.567708,
+    "ast_hash": "ddeb118cf83d0cddb1cc2a9e0c753f71",
+    "semantic_hash": "ddeb118cf83d0cddb1cc2a9e0c753f71"
+  },
+  "components/DiscountBadge.js": {
+    "mtime": 1791288947.9667075,
+    "seen": 1794073763.567787,
+    "ast_hash": "4a3cbbe66a68f433c4ab2b5b1a843812",
+    "semantic_hash": "4a3cbbe66a68f433c4ab2b5b1a843812"
+  },
+  "components/FilterModalTrigger.js": {
+    "mtime": 1791208217.0,
+    "seen": 1794073763.5678642,
+    "ast_hash": "9dd0faa25f3f9fe3bb5cb9b85ad820fd",
+    "semantic_hash": "9dd0faa25f3f9fe3bb5cb9b85ad820fd"
+  },
+  "components/FoodDetails.js": {
+    "mtime": 1791713945.740675,
+    "seen": 1794073763.5679433,
+    "ast_hash": "5229b70e6c6125a2b6e913d99838c3a6",
+    "semantic_hash": "5229b70e6c6125a2b6e913d99838c3a6"
+  },
+  "components/HeaderBar.js": {
+    "mtime": 1794498603.8090825,
+    "seen": 1794498629.336543,
+    "ast_hash": "b9f46e6f89375712e06e170307cdf9ac",
+    "semantic_hash": ""
+  },
+  "components/Icons.js": {
+    "mtime": 1794071099.2018583,
+    "seen": 1794073763.5681093,
+    "ast_hash": "905ef554686f02ff022139c38d1ad107",
+    "semantic_hash": "905ef554686f02ff022139c38d1ad107"
+  },
+  "components/LiquidGlassDefs.js": {
+    "mtime": 1791290047.5906744,
+    "seen": 1794073763.5683901,
+    "ast_hash": "060f975a9878f2372f1465434b2b90cc",
+    "semantic_hash": "060f975a9878f2372f1465434b2b90cc"
+  },
+  "components/LocationSelector.js": {
+    "mtime": 1791711516.7112186,
+    "seen": 1794073763.5687153,
+    "ast_hash": "15f3c2e2364fe8cf21a4adfca0f0b328",
+    "semantic_hash": "15f3c2e2364fe8cf21a4adfca0f0b328"
+  },
+  "components/NotificationButton.js": {
+    "mtime": 1791285519.1542382,
+    "seen": 1794073763.5690358,
+    "ast_hash": "11ace5c8b1eb41995f7bad78aac6b634",
+    "semantic_hash": "11ace5c8b1eb41995f7bad78aac6b634"
+  },
+  "components/ProductCard.js": {
+    "mtime": 1791486273.541059,
+    "seen": 1794073763.5694652,
+    "ast_hash": "3160f5d9c3bb6da0be212b15a4d013aa",
+    "semantic_hash": "3160f5d9c3bb6da0be212b15a4d013aa"
+  },
+  "components/ProductGrid.js": {
+    "mtime": 1791493545.8028731,
+    "seen": 1794073763.5700617,
+    "ast_hash": "c9dfb6d7c8adf981edc6df40edc8419a",
+    "semantic_hash": "c9dfb6d7c8adf981edc6df40edc8419a"
+  },
+  "components/SearchSection.js": {
+    "mtime": 1791708489.029796,
+    "seen": 1794073763.570373,
+    "ast_hash": "e6ae54d67adcd01f6356aecadb83f10e",
+    "semantic_hash": "e6ae54d67adcd01f6356aecadb83f10e"
+  },
+  "components/WishlistToggle.js": {
+    "mtime": 1791285608.6535544,
+    "seen": 1794073763.5705044,
+    "ast_hash": "77ed2d34d49fece50b8a76e3e9bd26cc",
+    "semantic_hash": "77ed2d34d49fece50b8a76e3e9bd26cc"
+  },
+  "data/products.js": {
+    "mtime": 1791709323.9072223,
+    "seen": 1794073763.570634,
+    "ast_hash": "59d2926e6c86d7dea497cb073605a7de",
+    "semantic_hash": "59d2926e6c86d7dea497cb073605a7de"
+  },
+  "eslint.config.mjs": {
+    "mtime": 1791212184.8675573,
+    "seen": 1794073763.5709188,
+    "ast_hash": "3fe70b5e7eaafcfdc380402563915470",
+    "semantic_hash": "3fe70b5e7eaafcfdc380402563915470"
+  },
+  "jsconfig.json": {
+    "mtime": 1791208181.0,
+    "seen": 1794073763.5710464,
+    "ast_hash": "ea6a4ac82bf757a9c1f5a3911b56cf9c",
+    "semantic_hash": "ea6a4ac82bf757a9c1f5a3911b56cf9c"
+  },
+  "lib/useFavs.js": {
+    "mtime": 1791376085.4022875,
+    "seen": 1794073763.571137,
+    "ast_hash": "15a434f36898b96dadcb385460251663",
+    "semantic_hash": "15a434f36898b96dadcb385460251663"
+  },
+  "lib/useKeyboardInset.js": {
+    "mtime": 1791710031.1305535,
+    "seen": 1794073763.5712218,
+    "ast_hash": "45e9579419810d7487fc9f69b53f661d",
+    "semantic_hash": "45e9579419810d7487fc9f69b53f661d"
+  },
+  "next.config.js": {
+    "mtime": 1791569952.485299,
+    "seen": 1794073763.5713172,
+    "ast_hash": "9e568ace9ed19c05be19004a192c0645",
+    "semantic_hash": "9e568ace9ed19c05be19004a192c0645"
+  },
+  "package.json": {
+    "mtime": 1791568873.3064826,
+    "seen": 1794073763.5713973,
+    "ast_hash": "629ee50da04a7da283ec434b266ef13d",
+    "semantic_hash": "629ee50da04a7da283ec434b266ef13d"
+  },
+  "vercel.json": {
+    "mtime": 1791573320.532845,
+    "seen": 1794073763.5714734,
+    "ast_hash": "2e7e176d1430c4f1a068f422b1a9f3e4",
+    "semantic_hash": "2e7e176d1430c4f1a068f422b1a9f3e4"
+  },
+  "components/NotificationPanel.js": {
+    "mtime": 1794347912.648324,
+    "seen": 1794347938.0830147,
+    "ast_hash": "639756b993edd495468ef164e8f1c53a",
+    "semantic_hash": ""
+  },
+  "data/notifications.js": {
+    "mtime": 1794347912.6521497,
+    "seen": 1794347938.083035,
+    "ast_hash": "a2ce20e5bd9129d81da5279fd05fbab4",
+    "semantic_hash": ""
+  },
+  ".github/copilot-instructions.md": {
+    "mtime": 1794075010.3305743,
+    "seen": 1794347938.0830708,
+    "ast_hash": "7370efa1ef0e4a1fbbdb486291d869de",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1791566146.263459,
+    "seen": 1794347938.0830743,
+    "ast_hash": "01e8142356e15c3404e0d84c48187cd0",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1791566146.263459,
+    "seen": 1794347938.0830781,
+    "ast_hash": "5c27369b226fcf2be8a6cfe52224e767",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1791644832.3941734,
+    "seen": 1794347938.0830808,
+    "ast_hash": "ef97a51b31c09e66a8a770c4ca479aee",
+    "semantic_hash": ""
+  },
+  "public/images/Cheese-Fries.webp": {
+    "mtime": 1791468329.5146859,
+    "seen": 1794347938.0830839,
+    "ast_hash": "a5bf43ef9a731e46c186e740c2c77f8a",
+    "semantic_hash": ""
+  },
+  "public/images/Garlic-Steak-Pizza.webp": {
+    "mtime": 1791470080.5500474,
+    "seen": 1794347938.083086,
+    "ast_hash": "7cac86956cd530436c3b84f5137664ac",
+    "semantic_hash": ""
+  },
+  "public/images/Pepperoni-pizza.webp": {
+    "mtime": 1791470079.0852635,
+    "seen": 1794347938.0830884,
+    "ast_hash": "7a91ad96819545144f0816b420123358",
+    "semantic_hash": ""
+  },
+  "public/images/Soup.webp": {
+    "mtime": 1791484350.5831983,
+    "seen": 1794347938.0830917,
+    "ast_hash": "d49cd7868686a836e93f534104fb78ec",
+    "semantic_hash": ""
+  },
+  "public/images/avatar.svg": {
+    "mtime": 1791208181.0,
+    "seen": 1794347938.0830946,
+    "ast_hash": "94d65581f7b532fe18dffac772e299c6",
+    "semantic_hash": ""
+  },
+  "public/images/burger.webp": {
+    "mtime": 1791291793.3514273,
+    "seen": 1794347938.083097,
+    "ast_hash": "5dd53a02778963460929bf2c3e6a1251",
+    "semantic_hash": ""
+  },
+  "public/images/chicken.webp": {
+    "mtime": 1791292213.8444443,
+    "seen": 1794347938.0830996,
+    "ast_hash": "5639918584d5ea6d9b7f1b6850075508",
+    "semantic_hash": ""
+  },
+  "public/images/doogh.webp": {
+    "mtime": 1791487393.1355765,
+    "seen": 1794347938.0831044,
+    "ast_hash": "c46e484e229428e1b602a3cca9763957",
+    "semantic_hash": ""
+  },
+  "public/images/drink-black.webp": {
+    "mtime": 1791292934.0582354,
+    "seen": 1794347938.0831075,
+    "ast_hash": "1f05a51f3d7915324157386bdc491093",
+    "semantic_hash": ""
+  },
+  "public/images/drink-blue.webp": {
+    "mtime": 1791294781.4315934,
+    "seen": 1794347938.0831099,
+    "ast_hash": "2618528b1500d11eef5eed4525792f65",
+    "semantic_hash": ""
+  },
+  "public/images/grilled-steaks.webp": {
+    "mtime": 1791485663.1977336,
+    "seen": 1794347938.0831122,
+    "ast_hash": "5d794ce93d60061dc55d804327cc91dd",
+    "semantic_hash": ""
+  },
+  "public/images/hot-dog.webp": {
+    "mtime": 1791383995.5349817,
+    "seen": 1794347938.0831144,
+    "ast_hash": "454bb7ef9d2a64c6cc689b25d2a81dac",
+    "semantic_hash": ""
+  },
+  "public/images/lazania.webp": {
+    "mtime": 1791309695.6786306,
+    "seen": 1794347938.0831168,
+    "ast_hash": "27b4b5b60aa83fcab2c27733a9345af7",
+    "semantic_hash": ""
+  },
+  "public/images/penne-pasta.webp": {
+    "mtime": 1791303786.9490738,
+    "seen": 1794347938.083119,
+    "ast_hash": "8d6d588b0b754944f6ec5d7e5536089a",
+    "semantic_hash": ""
+  },
+  "public/images/pizza.webp": {
+    "mtime": 1791291812.0148451,
+    "seen": 1794347938.0831223,
+    "ast_hash": "fbfc85163dd0d8b6b1152dc8fb02c017",
+    "semantic_hash": ""
+  },
+  "public/images/salad.webp": {
+    "mtime": 1791382222.5767717,
+    "seen": 1794347938.0831242,
+    "ast_hash": "d77b665ddc809c40632441070a0cbc9e",
+    "semantic_hash": ""
+  },
+  "public/screen-recording-inspect.mp4": {
+    "mtime": 1794405294.2871144,
+    "seen": 1794406485.4060683,
+    "ast_hash": "59fd137f95ff5893d69d8a239b570bc5",
+    "semantic_hash": ""
+  },
+  "package-lock.json": {
+    "mtime": 1791568873.4273727,
+    "seen": 1794347938.0831268,
+    "ast_hash": "dc9bd38aafe15ac545013ff3c860f9a4",
+    "semantic_hash": ""
+  }
+}

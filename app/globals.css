@@ -45,6 +45,7 @@ button { transition: transform .12s, opacity .12s; }
     linear-gradient(180deg, #e7f7ac 0%, #d3f3d2 17%, #cdeff0 42%, #def3f5 75%, #e8f6f6 100%);
 }
 .content { padding: calc(var(--safe-top) + 56px) var(--pad) calc(120px + var(--safe-bottom)); }
+.content.menu-content { padding-top: calc(var(--safe-top) + 186px); }
 .empty { margin: 60px 0; text-align: center; color: var(--muted); font-size: 15px; }
 .toast {
   position: fixed; left: 50%; bottom: calc(110px + var(--safe-bottom));
@@ -70,10 +71,16 @@ button { transition: transform .12s, opacity .12s; }
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
-  width: min(calc(100% - var(--pad) - var(--pad)), calc(var(--app-w) - var(--pad) - var(--pad)));
+  width: min(calc(100% - 24px), calc(var(--app-w) - 24px));
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.header-row { display: flex; width: 100%; align-items: center; justify-content: space-between; }
+.header-bar.menu-header {
+  align-items: stretch;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 .location { display: flex; align-items: center; gap: 12px; text-align: left; min-height: 44px; }
 .location-pin {
@@ -82,7 +89,15 @@ button { transition: transform .12s, opacity .12s; }
   background: radial-gradient(circle at 30% 25%, #e6f87a, var(--lime) 70%);
   box-shadow: 0 4px 14px rgba(160, 200, 20, 0.35);
 }
-.location-text { display: flex; flex-direction: column; gap: 2px; }
+.location-text {
+  display: flex;
+  min-height: 46px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 5px 14px;
+  border-radius: 9999px;
+}
 .location-text small { font-size: 12px; color: var(--muted); }
 .location-text strong { font-size: 16px; font-weight: 700; }
 .icon-btn { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; }
@@ -276,6 +291,7 @@ html.glass-refract .badge-off {
 .search,
 .icon-btn,
 .location-pin,
+.location-text,
 .cta,
 .bottom-nav {
   isolation: isolate;
@@ -296,6 +312,7 @@ html.glass-refract .badge-off {
 .search::after,
 .icon-btn::after,
 .location-pin::after,
+.location-text::after,
 .cta::after,
 .bottom-nav::after {
   content: "";
@@ -317,7 +334,8 @@ html.glass-refract .badge-off {
 /* این‌ها position نداشتن، pseudo-element لازم داره */
 .search,
 .icon-btn,
-.location-pin { position: relative; }
+.location-pin,
+.location-text { position: relative; }
 
 /* ---- تنظیمات هر المان ---- */
 
@@ -326,6 +344,7 @@ html.glass-refract .badge-off {
 
 /* سرچ‌باکس و نوبار: کمی سفیدتر برای خوانایی متن */
 .search { background: rgba(255, 255, 255, 0.28); }
+.location-text { background: rgba(207, 238, 58, 0.35); }
 
 .bottom-nav {
   background: rgba(255, 255, 255, 0.30);
@@ -342,6 +361,30 @@ html.glass-refract .badge-off {
 /* لوکیشن: شیشه‌ی مایل به لیمویی */
 .location-pin { background: rgba(207, 238, 58, 0.35); }
 
+/* Keep the fixed header glass glossy while obscuring scrolling content beneath it. */
+.menu-header .search,
+.menu-header .header-row .icon-btn {
+  background: rgba(207, 238, 58, 0.35);
+  -webkit-backdrop-filter: blur(5px) saturate(140%) brightness(1.1);
+  backdrop-filter: blur(5px) saturate(140%) brightness(1.1);
+}
+
+.menu-header .search {
+  align-self: center;
+  width: var(--dock-w);
+  height: 54px;
+}
+
+.menu-header .location-text {
+  background: rgba(224, 242, 140, 0.9);
+  -webkit-backdrop-filter: blur(18px) saturate(170%) brightness(1.08);
+  backdrop-filter: blur(18px) saturate(170%) brightness(1.08);
+}
+
+html.glass-refract .menu-header .header-row .icon-btn {
+  -webkit-backdrop-filter: blur(5px) saturate(140%) brightness(1.1);
+  backdrop-filter: blur(5px) saturate(140%) brightness(1.1);
+}
 
 /* ============ Responsive: price / add button / badge-off ============ */
 
