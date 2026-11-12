@@ -3,21 +3,21 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppLayout from "@/components/AppLayout";
 import HeaderBar from "@/components/HeaderBar";
 import NotificationPanel from "@/components/NotificationPanel";
-import SearchSection from "@/components/SearchSection";
-import CategoryHorizontalScroller from "@/components/CategoryHorizontalScroller";
 import ProductGrid from "@/components/ProductGrid";
 import CurvedBottomNavigation from "@/components/CurvedBottomNavigation";
 import ChatSection from "@/components/ChatSection";
-import { categories, products, navItems } from "@/data/products";
+import { products, navItems } from "@/data/products";
 import { initialNotifications } from "@/data/notifications";
 import useFavs from "@/lib/useFavs";
 
 export default function HomePage() {
-  const [category, setCategory] = useState("All");
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("home");
   const [toast, setToast] = useState("");
   const [notifOpen, setNotifOpen] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const openSearch = () => setSearching(true);
+  const closeSearch = () => { setSearching(false); setQuery(""); };
   const [notifications, setNotifications] = useState(initialNotifications);
   const timer = useRef(null);
 
@@ -33,7 +33,6 @@ export default function HomePage() {
 
   const [favs, toggleFav] = useFavs();
 
-  const openFilters = () => showToast("Filters coming soon");
   const openNotifications = () => setNotifOpen(true);
   const closeNotifications = useCallback(() => setNotifOpen(false), []);
   const markAllRead = () => setNotifications((list) => list.map((item) => ({ ...item, read: true })));
@@ -43,12 +42,8 @@ export default function HomePage() {
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return products.filter((p) => {
-      const byCat = category === "All" || p.category === category;
-      const byQuery = !q || p.name.toLowerCase().includes(q);
-      return byCat && byQuery;
-    });
-  }, [category, query]);
+    return products.filter((p) => !q || p.name.toLowerCase().includes(q));
+  }, [query]);
 
   const favoriteProducts = useMemo(() => products.filter((p) => favs.has(p.id)), [favs]);
 
@@ -60,12 +55,14 @@ export default function HomePage() {
             <HeaderBar
               menu
               showLocation
+              searching={searching}
+              query={query}
+              onQueryChange={setQuery}
+              onOpenSearch={openSearch}
+              onCloseSearch={closeSearch}
               onOpenLocation={openLocation}
               onOpenNotifications={openNotifications}
-            >
-              <SearchSection value={query} onChange={setQuery} onOpenFilters={openFilters} />
-              <CategoryHorizontalScroller items={categories} active={category} onSelect={setCategory} />
-            </HeaderBar>
+            />
             <ProductGrid products={visible} liked={favs} onToggleLike={toggleFav} />
           </>
         ) : tab === "favorite" ? (

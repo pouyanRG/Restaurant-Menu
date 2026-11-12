@@ -45,7 +45,7 @@ button { transition: transform .12s, opacity .12s; }
     linear-gradient(180deg, #e7f7ac 0%, #d3f3d2 17%, #cdeff0 42%, #def3f5 75%, #e8f6f6 100%);
 }
 .content { padding: calc(var(--safe-top) + 56px) var(--pad) calc(120px + var(--safe-bottom)); }
-.content.menu-content { padding-top: calc(var(--safe-top) + 186px); }
+.content.menu-content { padding-top: calc(var(--safe-top) + 68px); }
 .empty { margin: 60px 0; text-align: center; color: var(--muted); font-size: 15px; }
 .toast {
   position: fixed; left: 50%; bottom: calc(110px + var(--safe-bottom));
@@ -78,6 +78,8 @@ button { transition: transform .12s, opacity .12s; }
 }
 .header-row { display: flex; width: 100%; align-items: center; justify-content: space-between; }
 .header-bar.menu-header {
+  top: 0;
+  padding-top: calc(var(--safe-top) + 10px);
   align-items: stretch;
   flex-direction: column;
   justify-content: flex-start;
@@ -128,11 +130,6 @@ html.glass-refract .header-bar .icon-btn {
 }
 
 /* ============ Category chips ============ */
-.chips {
-  display: flex; gap: 8px; margin: 16px calc(var(--pad) * -1) 0; padding: 0 var(--pad);
-  overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch;
-}
-.chips::-webkit-scrollbar { display: none; }
 .chip {
   flex: none; scroll-snap-align: start; min-height: 40px; padding: 0 13px;
   font-size: 14px; color: #1b1b1b; border-radius: 8px; border-bottom: 2px solid transparent;
@@ -567,14 +564,14 @@ a.icon-btn { text-decoration: none; color: inherit; }
   background: linear-gradient(135deg, #f8fcff 0%, #e4f2fb 100%); color: #173248;
   border-bottom-right-radius: 6px;
   border: 1px solid rgba(104, 151, 181, 0.2);
-  box-shadow: 0 12px 32px rgba(63, 117, 153, 0.14), 0 3px 10px rgba(63, 117, 153, 0.06);
+  box-shadow: none;
 }
 .bubble.bot {
   align-self: flex-end; /* در rtl یعنی چپ */
   border-bottom-left-radius: 6px;
   background: rgba(255, 255, 255, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: inset 2px 2px 1px -1px rgba(255, 255, 255, 0.95), inset 0 0 14px rgba(255, 255, 255, 0.3), 0 14px 36px rgba(35, 75, 68, 0.08), 0 3px 10px rgba(35, 75, 68, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: none;
 }
 
 /* product cards inside chat */
@@ -960,7 +957,7 @@ a.icon-btn { text-decoration: none; color: inherit; }
   z-index: -1;
   left: -12px;
   right: -12px;
-  top: calc(-1 * (var(--safe-top) + 10px));
+  top: 0;
   bottom: -14px;
   pointer-events: none;
 
@@ -999,8 +996,8 @@ a.icon-btn { text-decoration: none; color: inherit; }
 .menu-header::before {
   background: linear-gradient(
     180deg,
-    rgba(238, 247, 201, 0.97) 0%,
-    rgba(222, 243, 224, 0.96) 100%
+    rgba(238, 247, 201, 0.98) 0%,
+    rgba(222, 243, 224, 0.18) 100%
   );
 }
 
@@ -1023,3 +1020,114 @@ a.icon-btn { text-decoration: none; color: inherit; }
 
 /* بج تخفیف: کمی سفید، تا زرد/نارنجی کارت را بلند نکند */
 .badge-off { background: rgba(255, 255, 255, 0.30); }
+
+/* ============ Morph header: duo pill ⇄ search box ============ */
+:root { --morph: cubic-bezier(.32, .72, 0, 1); }
+
+.morph-row { align-items: center; }
+
+.location-bar {
+  display: flex; align-items: center; gap: 12px;
+  min-width: 0; flex: 0 1 auto;
+  transition: flex-grow .5s var(--morph);
+}
+.location-text {
+  flex: 0 1 auto; min-width: 0;
+  transition: flex-grow .5s var(--morph);
+}
+/* کشیده شدن location-text تا تبدیل به سرچ‌باکس شود */
+.morph-row.is-searching .location-bar,
+.morph-row.is-searching .location-text { flex-grow: 1; }
+
+/* دکمه‌ی لوکیشن / برگشت */
+.location-toggle { cursor: pointer; }
+.location-toggle .pin-ic {
+  grid-area: 1 / 1; display: grid; place-items: center;
+  transition: opacity .25s, transform .45s var(--morph);
+}
+.pin-ic-back { opacity: 0; transform: scale(.5) rotate(-90deg); }
+.morph-row.is-searching .pin-ic-pin { opacity: 0; transform: scale(.5) rotate(90deg); }
+.morph-row.is-searching .pin-ic-back { opacity: 1; transform: none; }
+
+/* متن آدرس */
+.location-label {
+  display: flex; flex-direction: column; gap: 2px;
+  text-align: left; white-space: nowrap;
+  transition: opacity .18s;
+}
+.location-label small { font-size: 12px; color: var(--muted); }
+.location-label strong { font-size: 16px; font-weight: 700; }
+.morph-row.is-searching .location-label { opacity: 0; pointer-events: none; }
+
+/* لایه‌ی سرچ داخل همان کپسول */
+.location-search {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 8px 0 16px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .15s;
+}
+.morph-row.is-searching .location-search {
+  opacity: 1; pointer-events: auto;
+  transition: opacity .25s .2s;
+}
+.location-search input {
+  flex: 1; min-width: 0; height: 100%;
+  border: 0; outline: 0; background: transparent;
+  font: inherit; font-size: 16px; color: var(--ink);
+}
+.location-search input::placeholder { color: #333; opacity: 1; }
+.location-search input::-webkit-search-cancel-button { display: none; }
+.search-clear {
+  flex: none; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 14px;
+}
+
+/* دکمه‌ی دو بخشی: ظاهر مثل location-text */
+.duo {
+  position: relative; isolation: isolate; flex: none;
+  display: flex; align-items: center;
+  height: 46px; margin-left: 10px;
+  max-width: 104px; overflow: hidden;
+  border-radius: 9999px;
+  background: rgba(224, 242, 140, 0.9);
+  -webkit-backdrop-filter: blur(18px) saturate(170%) brightness(1.08);
+  backdrop-filter: blur(18px) saturate(170%) brightness(1.08);
+  box-shadow:
+    inset 2px 2px 1px -1px rgba(255, 255, 255, 0.95),
+    inset -2px -2px 1px -1px rgba(255, 255, 255, 0.75),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.20),
+    inset 0 0 16px rgba(255, 255, 255, 0.20),
+    0 10px 24px rgba(0, 0, 0, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+  transition:
+    max-width .5s var(--morph), margin-left .5s var(--morph),
+    opacity .3s, transform .5s var(--morph), visibility 0s;
+}
+.duo::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+  background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 35%,
+    rgba(255,255,255,0) 65%, rgba(255,255,255,.85) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.duo-btn { flex: none; width: 50px; height: 46px; display: grid; place-items: center; color: var(--ink); }
+.duo-sep { flex: none; width: 1px; height: 22px; background: rgba(17, 17, 17, .14); }
+
+/* جمع شدن به سمت راست و حذف */
+.morph-row.is-searching .duo {
+  max-width: 0; margin-left: 0; opacity: 0;
+  transform: translateX(28px) scale(.9);
+  pointer-events: none; visibility: hidden;
+  transition:
+    max-width .5s var(--morph), margin-left .5s var(--morph),
+    opacity .3s, transform .5s var(--morph), visibility 0s .5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .location-bar, .location-text, .duo, .location-search,
+  .location-label, .location-toggle .pin-ic { transition: none !important; }
+}
