@@ -9,6 +9,23 @@ import { blobToWav16k } from "@/lib/audio";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const QUICK = ["What's the most popular dish?", "What do you recommend?","What's the best pizza?","What are the vegan options?","What's your best dessert?","What can I get under $10?"];
+const STT_ERRORS = {
+  400: "فایل صوتی معتبر نبود، دوباره ضبط کن.",
+  403: "تأیید امنیتی یا دسترسی سرور رد شد.",
+  413: "ضبط خیلی طولانی است، کوتاه‌تر ضبط کن.",
+  429: "تعداد درخواست‌ها زیاد است، کمی بعد دوباره تلاش کن.",
+  503: "سرویس تبدیل صدا موقتاً در دسترس نیست.",
+  504: "تبدیل صدا زیاد طول کشید، دوباره تلاش کن."
+};
+
+const CHAT_ERRORS = {
+  400: "درخواست معتبر نبود. دوباره تلاش کن.",
+  403: "دسترسی یا تأیید امنیتی رد شد.",
+  413: "حجم عکس زیاد است. یک عکس کوچک‌تر انتخاب کن.",
+  429: "تعداد پیام‌ها زیاد است، کمی بعد دوباره تلاش کن.",
+  503: "سرویس چت موقتاً در دسترس نیست، کمی بعد امتحان کن.",
+  504: "پاسخ دیر شد، دوباره تلاش کن."
+};
 const MAX_LEN = 500;
 const MIN_TEXTAREA_HEIGHT = 36;
 const MAX_TEXTAREA_HEIGHT = 136;
@@ -108,11 +125,10 @@ export default function ChatSection() {
   const [processingImage, setProcessingImage] = useState(false);
   const [imageStatus, setImageStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const [streaming, setStreaming] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [voiceNote, setVoiceNote] = useState("");
-  const [typingIndex, setTypingIndex] = useState(null);
-  const [shown, setShown] = useState(0);
-  const busy = loading || typingIndex !== null || transcribing;
+  const busy = loading || streaming || transcribing;
   const endRef = useRef(null);
   const taRef = useRef(null);
   const fileRef = useRef(null);
@@ -143,14 +159,16 @@ export default function ChatSection() {
       const response = await fetch("/api/transcribe", { method: "POST", body: form });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setVoiceNote(response.status === 429 ? "تعداد درخواست‌ها زیاد است، کمی بعد دوباره تلاش کن." : "تبدیل صدا به متن انجام نشد، دوباره تلاش کن.");
+        console.error("Transcribe error:", response.status, data);
+        setVoiceNote(STT_ERRORS[response.status] || "تبدیل صدا به متن انجام نشد، دوباره تلاش کن.");
         return;
       }
       const text = (data.text || "").trim();
       if (!text) { setVoiceNote("صدایی تشخیص داده نشد."); return; }
       setInput((current) => (current ? `${current} ${text}` : text).slice(0, MAX_LEN));
       taRef.current?.focus();
-    } catch {
+    } catch (error) {
+      console.error("Voice processing failed:", error);
       setVoiceNote("پردازش صدا انجام نشد، دوباره تلاش کن.");
     } finally {
       setTranscribing(false);
@@ -160,31 +178,17 @@ export default function ChatSection() {
 
   const { recording, analyserRef, start, stop, cancel } = useVoiceRecorder({
     onFinish: transcribeBlob,
-    onError: (code) => setVoiceNote(code === "denied" ? "دسترسی به میکروفون داده نشد. از تنظیمات مرورگر اجازه بده."
-      : code === "unsupported" ? "این مرورگر ضبط صدا را پشتیبانی نمی‌کند." : "ضبط صدا شروع نشد.")
+    onError: (code) => setVoiceNote(
+      code === "denied" ? "دسترسی به میکروفون داده نشد. از تنظیمات مرورگر اجازه بده."
+        : code === "unsupported" ? "این مرورگر ضبط صدا را پشتیبانی نمی‌کند."
+          : code === "empty" ? "صدایی ضبط نشد، دوباره تلاش کن."
+            : "ضبط صدا شروع نشد.")
   });
+  const canSend = Boolean(input.trim() || pendingImage) && !busy && !recording && !processingImage;
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: typingIndex !== null ? "auto" : "smooth" });
-  }, [messages, loading, shown, typingIndex]);
-
-  useEffect(() => {
-    if (typingIndex === null) return undefined;
-
-    const total = Array.from(messages[typingIndex]?.text || "").length;
-    const step = Math.max(1, Math.ceil(total / 150));
-    let current = 0;
-    const id = setInterval(() => {
-      current = Math.min(current + step, total);
-      setShown(current);
-      if (current >= total) {
-        clearInterval(id);
-        setTypingIndex(null);
-      }
-    }, 25);
-
-    return () => clearInterval(id);
-  }, [typingIndex, messages]);
+    endRef.current?.scrollIntoView({ behavior: streaming ? "auto" : "smooth" });
+  }, [messages, loading, streaming]);
 
   // Measure in the expanded layout so wrapping does not change the mode after it expands.
   useLayoutEffect(() => {
@@ -341,7 +345,10 @@ export default function ChatSection() {
     setPendingImage(null);
     setProcessingImage(false);
     setImageStatus("");
+    setVoiceNote("");
     setLoading(true);
+
+    const setReply = (reply) => setMessages([...next, { role: "model", text: reply }]);
 
     try {
       const requestMessages = next.map((message, index) => {
@@ -358,32 +365,40 @@ export default function ChatSection() {
         }
         return textMessage;
       });
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: requestMessages, token: tokenRef.current })
       });
-      const data = await response.json().catch(() => ({}));
-      const reply = response.status === 429
-        ? "تعداد پیام‌ها زیاد است، کمی بعد دوباره تلاش کن."
-        : response.status === 503
-          ? "سرویس چت موقتاً در دسترس نیست، کمی بعد امتحان کن."
-          : response.status === 504
-            ? "پاسخ دیر شد، دوباره تلاش کن."
-            : response.status === 413
-              ? "حجم عکس زیاد است. یک عکس کوچک‌تر انتخاب کن."
-              : response.ok
-                ? data.reply
-                : "خطا در دریافت پاسخ";
-      setMessages([...next, { role: "model", text: reply || "پاسخی دریافت نشد." }]);
-      setShown(0);
-      setTypingIndex(next.length);
-    } catch {
-      setMessages([...next, { role: "model", text: "خطا در اتصال. دوباره تلاش کن." }]);
-      setShown(0);
-      setTypingIndex(next.length);
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        console.error("Chat error:", response.status, data);
+        setReply(CHAT_ERRORS[response.status] || "خطا در دریافت پاسخ");
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let full = "";
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        full += decoder.decode(value, { stream: true });
+        if (!full) continue;
+        setLoading(false);
+        setStreaming(true);
+        setReply(full);
+      }
+      full += decoder.decode();
+      setReply(full.trim() || "پاسخی دریافت نشد.");
+    } catch (error) {
+      console.error("Chat request failed:", error);
+      setReply("خطا در اتصال. دوباره تلاش کن.");
     } finally {
       setLoading(false);
+      setStreaming(false);
       resetCaptcha();
     }
   }
@@ -413,9 +428,9 @@ export default function ChatSection() {
     <section className={`chat${typing ? " is-typing" : ""}`} aria-label="Chat">
       <div className="chat-list" dir="rtl" role="log" aria-live="polite">
         {messages.map((message, index) => {
-          const isTyping = index === typingIndex;
-          const text = isTyping ? Array.from(message.text).slice(0, shown).join("") : message.text;
-          const cards = message.role === "model" && index > 0 && !isTyping ? findMentioned(message.text) : [];
+          const isStreamingMsg = streaming && index === messages.length - 1;
+          const text = message.text;
+          const cards = message.role === "model" && index > 0 && !isStreamingMsg ? findMentioned(text) : [];
           const usesPersianFont = /\p{Script=Arabic}/u.test(text);
           return (
             <div key={index} className="chat-row">
@@ -461,6 +476,7 @@ export default function ChatSection() {
           </div>
         )}
 
+        {transcribing && <p className="chat-image-status is-processing" role="status">در حال تبدیل صدا به متن…</p>}
         {voiceNote && <p className="voice-note" role="alert" dir="auto">{voiceNote}</p>}
         <form className={`chat-form${composerExpanded ? " is-expanded" : ""}${recording ? " is-recording" : ""}`} dir="rtl" style={{ height: composerHeight }} onSubmit={handleSubmit}>
           <input ref={fileRef} className="chat-file-input" type="file" accept="image/*" onChange={handleImageSelect} tabIndex={-1} aria-label="Choose food image" />
@@ -469,7 +485,7 @@ export default function ChatSection() {
             <VoiceWaveform analyserRef={analyserRef} />
             <button type="button" className="snd rec-stop" aria-label="Stop and transcribe" onClick={stop}><StopIcon /></button>
           </>}
-          <button type="submit" className={`snd send-action${input.trim() && !busy || recording ? " is-ready" : ""}`} aria-label="Send" onMouseDown={(event) => event.preventDefault()} disabled={busy || recording || !input.trim()}><SendIcon /></button>
+          <button type="submit" className={`snd send-action${canSend || recording ? " is-ready" : ""}`} aria-label="Send" onMouseDown={(event) => event.preventDefault()} disabled={!canSend}><SendIcon /></button>
           <textarea ref={taRef} className={inputUsesArabicScript ? "is-persian" : "is-english"} dir="auto" rows={1} hidden={recording} value={input}
             onChange={(event) => setInput(event.target.value)} onKeyDown={handleKeyDown}
             onFocus={() => setTyping(true)} onBlur={() => setTyping(false)}
@@ -477,7 +493,11 @@ export default function ChatSection() {
             aria-label="Message" maxLength={MAX_LEN} readOnly={transcribing} />
           <span className="cnt" hidden={recording}>{input.length}/{MAX_LEN}</span>
           <button type="button" className="snd mic" aria-label="Voice recording" hidden={recording}
-            onMouseDown={(event) => event.preventDefault()} onClick={() => { if (busy) return; setVoiceNote(""); start(); }}><MicIcon /></button>
+            onMouseDown={(event) => event.preventDefault()} onClick={() => {
+              if (busy) { setVoiceNote("صبر کن تا کار قبلی تمام شود."); return; }
+              setVoiceNote("");
+              start();
+            }}><MicIcon /></button>
         </form>
       </div>
     </section>

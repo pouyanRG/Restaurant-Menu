@@ -70,25 +70,68 @@ function buildGenerationConfig(model) {
   return config;
 }
 
-async function callGemini(model, contents) {
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": process.env.GEMINI_API_KEY
-      },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: SYSTEM }] },
-        contents,
-        generationConfig: buildGenerationConfig(model)
-      }),
-      signal: AbortSignal.timeout(12000)
+async function openGeminiStream(model, contents) {
+  // Timeout only covers waiting for the first response headers, not the whole stream.
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    return await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": process.env.GEMINI_API_KEY
+        },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: SYSTEM }] },
+          contents,
+          generationConfig: buildGenerationConfig(model)
+        }),
+        signal: controller.signal
+      }
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Converts Gemini's SSE stream into a plain UTF-8 text stream.
+function geminiSseToText(upstream) {
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+  let buffer = "";
+
+  return new ReadableStream({
+    async start(controller) {
+      const reader = upstream.getReader();
+      try {
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split(/\r?\n/);
+          buffer = lines.pop() ?? "";
+          for (const line of lines) {
+            if (!line.startsWith("data:")) continue;
+            const payload = line.slice(5).trim();
+            if (!payload) continue;
+            try {
+              const data = JSON.parse(payload);
+              const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
+              if (text) controller.enqueue(encoder.encode(text));
+            } catch {
+              // Ignore partial or non-JSON SSE lines.
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Gemini stream error:", error);
+      } finally {
+        controller.close();
+      }
     }
-  );
-  const data = await response.json().catch(() => ({}));
-  return { response, data };
+  });
 }
 
 const json = (body, status = 200) => Response.json(body, { status });
@@ -229,21 +272,24 @@ export async function POST(request) {
 
   for (const model of MODELS) {
     try {
-      const { response, data } = await callGemini(model, contents);
+      const response = await openGeminiStream(model, contents);
 
-      if (response.ok) {
-        const reply =
-          data.candidates?.[0]?.content?.parts?.map((part) => part.text).join("") ||
-          "Sorry, I couldn't answer that.";
-        return json({ reply });
+      if (response.ok && response.body) {
+        return new Response(geminiSseToText(response.body), {
+          headers: {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store"
+          }
+        });
       }
 
-      console.error(`Gemini error (${model}):`, data);
+      const data = await response.json().catch(() => ({}));
+      console.error(`Gemini error (${model}):`, response.status, data);
       lastStatus = response.status;
       if (!RETRY_STATUSES.has(response.status)) break;
     } catch (error) {
       console.error(`Gemini request failed (${model}):`, error);
-      lastStatus = error?.name === "TimeoutError" ? 504 : 500;
+      lastStatus = error?.name === "AbortError" || error?.name === "TimeoutError" ? 504 : 500;
     }
   }
 

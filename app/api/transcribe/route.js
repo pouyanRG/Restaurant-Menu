@@ -52,7 +52,8 @@ export async function POST(request) {
   const isWav = bytes.subarray(0, 4).toString("ascii") === "RIFF" && bytes.subarray(8, 12).toString("ascii") === "WAVE";
   if (!isWav) return json({ error: "Bad request" }, 400);
 
-  const generationConfig = { temperature: 0, maxOutputTokens: 600 };
+  // Thinking tokens count toward maxOutputTokens; 600 can leave an empty transcript.
+  const generationConfig = { temperature: 0, maxOutputTokens: 1024 };
   if (/^gemini-3/.test(MODEL)) generationConfig.thinkingConfig = { thinkingLevel: "low" };
 
   try {
@@ -65,7 +66,7 @@ export async function POST(request) {
           contents: [{ role: "user", parts: [{ text: PROMPT }, { inline_data: { mime_type: "audio/wav", data: bytes.toString("base64") } }] }],
           generationConfig
         }),
-        signal: AbortSignal.timeout(20000)
+        signal: AbortSignal.timeout(15000)
       }
     );
     const data = await response.json().catch(() => ({}));
