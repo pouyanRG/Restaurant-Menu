@@ -54,12 +54,17 @@ export default function ChatSection() {
     { role: "model", text: "Hi" }
   ]);
   const [input, setInput] = useState("");
+  const [pendingImage, setPendingImage] = useState(null);
+  const [processingImage, setProcessingImage] = useState(false);
+  const [imageStatus, setImageStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [typingIndex, setTypingIndex] = useState(null);
   const [shown, setShown] = useState(0);
   const busy = loading || typingIndex !== null;
   const endRef = useRef(null);
   const taRef = useRef(null);
+  const fileRef = useRef(null);
+  const imageRequestRef = useRef(0);
   const widgetBox = useRef(null);
   const widgetId = useRef(null);
   const tokenRef = useRef("");
@@ -155,9 +160,77 @@ export default function ChatSection() {
     };
   }, []);
 
-  async function send(text) {
-    const content = text.trim();
-    if (!content || busy) return;
+  function handleImageSelect(event) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    const requestId = ++imageRequestRef.current;
+    setPendingImage(null);
+
+    if (!file.type.startsWith("image/") || file.type === "image/svg+xml") {
+      setProcessingImage(false);
+      setImageStatus("لطفاً یک عکس غذا انتخاب کن.");
+      return;
+    }
+    if (file.size > 12 * 1024 * 1024) {
+      setProcessingImage(false);
+      setImageStatus("حجم عکس باید کمتر از ۱۲ مگابایت باشد.");
+      return;
+    }
+
+    setProcessingImage(true);
+    setImageStatus("");
+    const imageUrl = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(imageUrl);
+      if (requestId !== imageRequestRef.current) return;
+      setProcessingImage(false);
+      if (!image.naturalWidth || !image.naturalHeight) {
+        setImageStatus("این عکس باز نشد. لطفاً عکس دیگری انتخاب کن.");
+        return;
+      }
+      const scale = Math.min(1, 1280 / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const context = canvas.getContext("2d");
+      if (!context) {
+        setProcessingImage(false);
+        setImageStatus("پردازش عکس انجام نشد. دوباره امتحان کن.");
+        return;
+      }
+      let dataUrl;
+      try {
+        context.fillStyle = "#fff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+      } catch {
+        setProcessingImage(false);
+        setImageStatus("پردازش عکس انجام نشد. لطفاً عکس دیگری انتخاب کن.");
+        return;
+      }
+      if (dataUrl.length > 3_500_000) {
+        setProcessingImage(false);
+        setImageStatus("حجم عکس زیاد است. یک عکس کوچک‌تر انتخاب کن.");
+        return;
+      }
+      setPendingImage({ dataUrl, mimeType: "image/jpeg", name: file.name });
+      setProcessingImage(false);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(imageUrl);
+      if (requestId !== imageRequestRef.current) return;
+      setProcessingImage(false);
+      setImageStatus("این عکس باز نشد. لطفاً عکس دیگری انتخاب کن.");
+    };
+    image.src = imageUrl;
+  }
+
+  async function send(text, image = null) {
+    const content = text.trim() || (image ? "این غذا شبیه کدام مورد از منو است؟" : "");
+    if ((!content && !image) || busy || processingImage) return;
 
     if (SITE_KEY && !tokenRef.current) {
       setMessages((current) => [
@@ -167,16 +240,33 @@ export default function ChatSection() {
       return;
     }
 
-    const next = [...messages, { role: "user", text: content }];
+    const next = [...messages, { role: "user", text: content, ...(image ? { image: image.dataUrl } : {}) }];
     setMessages(next);
     setInput("");
+    setPendingImage(null);
+    setProcessingImage(false);
+    setImageStatus("");
     setLoading(true);
 
     try {
+      const requestMessages = next.map((message, index) => {
+        const textMessage = { ...message };
+        delete textMessage.image;
+        if (image && index === next.length - 1) {
+          return {
+            ...textMessage,
+            image: {
+              mimeType: image.mimeType,
+              data: image.dataUrl.slice(image.dataUrl.indexOf(",") + 1)
+            }
+          };
+        }
+        return textMessage;
+      });
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next, token: tokenRef.current })
+        body: JSON.stringify({ messages: requestMessages, token: tokenRef.current })
       });
       const data = await response.json().catch(() => ({}));
       const reply = response.status === 429
@@ -185,9 +275,11 @@ export default function ChatSection() {
           ? "سرویس چت موقتاً در دسترس نیست، کمی بعد امتحان کن."
           : response.status === 504
             ? "پاسخ دیر شد، دوباره تلاش کن."
-            : response.ok
-              ? data.reply
-              : "خطا در دریافت پاسخ";
+            : response.status === 413
+              ? "حجم عکس زیاد است. یک عکس کوچک‌تر انتخاب کن."
+              : response.ok
+                ? data.reply
+                : "خطا در دریافت پاسخ";
       setMessages([...next, { role: "model", text: reply || "پاسخی دریافت نشد." }]);
       setShown(0);
       setTypingIndex(next.length);
@@ -206,7 +298,14 @@ export default function ChatSection() {
 
   function handleSubmit(event) {
     event.preventDefault();
-    send(input);
+    send(input, pendingImage);
+  }
+
+  function removePendingImage() {
+    imageRequestRef.current += 1;
+    setPendingImage(null);
+    setProcessingImage(false);
+    setImageStatus("");
   }
 
   const inputUsesArabicScript = /\p{Script=Arabic}/u.test(input);
@@ -222,6 +321,7 @@ export default function ChatSection() {
           return (
             <div key={index} className="chat-row">
               <div dir="auto" className={`bubble ${message.role === "user" ? "me" : "bot"} ${usesPersianFont ? "is-persian" : "is-english"}`}>
+                {message.image && <img className="chat-photo" src={message.image} alt="عکس غذای ارسال‌شده" />}
                 {text}
               </div>
               {cards.length > 0 && (
@@ -240,7 +340,7 @@ export default function ChatSection() {
         <div ref={endRef} />
       </div>
       <div className={`chat-dock${typing ? " is-typing" : ""}`}>
-        {!messages.some((message) => message.role === "user") && (
+        {!pendingImage && !messages.some((message) => message.role === "user") && (
           <div className="chat-quick" role="group" aria-label="Suggested questions">
             {QUICK.map((question) => (
               <button key={question} type="button" className="chip" dir="auto" onMouseDown={(event) => event.preventDefault()} onClick={() => send(question)} aria-disabled={busy}>
@@ -252,8 +352,26 @@ export default function ChatSection() {
 
         {SITE_KEY && <div ref={widgetBox} className="chat-captcha" />}
 
+        {processingImage && <p className="chat-image-status is-processing" role="status">در حال آماده‌سازی عکس…</p>}
+        {imageStatus && <p className="chat-image-status" role="alert">{imageStatus}</p>}
+        {pendingImage && (
+          <div className="chat-image-preview" dir="rtl">
+            <img src={pendingImage.dataUrl} alt="پیش‌نمایش عکس غذا" />
+            <span>{pendingImage.name}</span>
+            <button type="button" onClick={removePendingImage} aria-label="حذف عکس انتخاب‌شده" disabled={busy}>×</button>
+          </div>
+        )}
+
         <form className={`chat-form${composerExpanded ? " is-expanded" : ""}`} dir="rtl" style={{ height: composerHeight }} onSubmit={handleSubmit}>
-          <span className="composer-icon composer-plus" aria-hidden="true"><PlusIcon /></span>
+          <input ref={fileRef} className="chat-file-input" type="file" accept="image/*" onChange={handleImageSelect} tabIndex={-1} aria-label="انتخاب عکس غذا" />
+          <button
+            type="button"
+            className="composer-icon composer-plus"
+            onClick={() => fileRef.current?.click()}
+            aria-label="ارسال عکس غذا"
+            title="ارسال عکس غذا"
+            disabled={busy}
+          ><PlusIcon /></button>
           <textarea
             ref={taRef}
             className={inputUsesArabicScript ? "is-persian" : "is-english"}
@@ -275,7 +393,7 @@ export default function ChatSection() {
               <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6" />
             </svg>
           </span>
-          <button type="submit" className={`snd${input.trim() ? " is-ready" : ""}`} aria-label="Send" onMouseDown={(event) => event.preventDefault()} aria-disabled={busy || !input.trim()}>
+          <button type="submit" className={`snd${input.trim() || pendingImage ? " is-ready" : ""}`} aria-label="Send" onMouseDown={(event) => event.preventDefault()} aria-disabled={busy || processingImage || (!input.trim() && !pendingImage)}>
             <SendIcon />
           </button>
         </form>

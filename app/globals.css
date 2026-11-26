@@ -557,6 +557,7 @@ a.icon-btn { text-decoration: none; color: inherit; }
 
 /* bubbles */
 .bubble { max-width: 84%; padding: 9px 13px; border-radius: 20px; font-size: 13px; line-height: 1.8; white-space: pre-wrap; }
+.chat-photo { display: block; width: min(220px, 65vw); max-height: 210px; object-fit: cover; margin: 0 0 6px auto; border-radius: 14px; }
 .bubble.is-english { font-family: var(--font-roboto), system-ui, sans-serif; }
 .bubble.is-persian { font-family: var(--font-vazir), var(--font-roboto), system-ui, sans-serif; }
 .bubble.me {
@@ -749,6 +750,24 @@ a.icon-btn { text-decoration: none; color: inherit; }
   gap: 8px;
 }
 .chat-dock .chat-quick { padding-block: 24px; }
+.chat-image-preview {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  max-width: 100%;
+  padding: 7px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+.chat-image-preview img { width: 48px; height: 48px; flex: none; object-fit: cover; border-radius: 10px; }
+.chat-image-preview span { min-width: 0; flex: 1; overflow: hidden; color: #3f403e; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.chat-image-preview button { width: 30px; height: 30px; flex: none; border: 0; border-radius: 50%; background: #f0efea; color: #333; font-size: 22px; line-height: 1; cursor: pointer; }
+.chat-image-preview button:disabled { cursor: not-allowed; opacity: 0.55; }
+.chat-image-status { margin: 0; padding: 0 8px; color: #9b2c2c; font-size: 12px; text-align: right; }
+.chat-image-status.is-processing { color: #59615f; }
+.chat-file-input { display: none; }
 
 .chat-form {
   position: relative;
@@ -829,7 +848,9 @@ a.icon-btn { text-decoration: none; color: inherit; }
 .composer-icon svg { display: block; width: 24px; height: 24px; }
 .composer-plus svg { width: 20px; height: 20px; }
 .composer-mic { color: #3f403e; }
-.composer-plus { position: absolute; left: 8px; bottom: 8px; }
+.composer-plus { position: absolute; left: 8px; bottom: 8px; border: 0; padding: 0; cursor: pointer; pointer-events: auto; }
+.composer-plus:focus-visible { outline: 2px solid #6b6b68; outline-offset: 3px; }
+.composer-plus:disabled { cursor: not-allowed; opacity: 0.55; }
 .composer-mic { position: absolute; right: 52px; bottom: 8px; }
 .snd {
   position: absolute;
