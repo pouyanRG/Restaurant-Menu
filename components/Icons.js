@@ -68,3 +68,20 @@ export const SendIcon = (p) => (
     <path d="M5 12l7-7 7 7" />
   </svg>
 );
+
+export const MicIcon = (p) => (
+  <svg viewBox="0 0 24 24" width="20" height="20" {...base} {...p}>
+    <rect x="9" y="3" width="6" height="11" rx="3" />
+    <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" />
+  </svg>
+);
+export const TrashIcon = (p) => (
+  <svg viewBox="0 0 24 24" width="20" height="20" {...base} {...p}>
+    <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12.5h10L18 7M9.5 7V4.5h5V7" />
+  </svg>
+);
+export const StopIcon = (p) => (
+  <svg viewBox="0 0 24 24" width="18" height="18" {...base} fill="currentColor" {...p}>
+    <rect x="6" y="6" width="12" height="12" rx="2.5" />
+  </svg>
+);

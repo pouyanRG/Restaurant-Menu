@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, PlusIcon, SendIcon } from "./Icons";
+import { ChevronRight, PlusIcon, SendIcon, MicIcon, StopIcon } from "./Icons";
 import { products } from "@/data/products";
 import useKeyboardInset from "@/lib/useKeyboardInset";
+import useVoiceRecorder from "@/lib/useVoiceRecorder";
+import { blobToWav16k } from "@/lib/audio";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const QUICK = ["What's the most popular dish?", "What do you recommend?","What's the best pizza?","What are the vegan options?","What's your best dessert?","What can I get under $10?"];
@@ -12,6 +14,54 @@ const MIN_TEXTAREA_HEIGHT = 36;
 const MAX_TEXTAREA_HEIGHT = 136;
 const COMPACT_COMPOSER_HEIGHT = 54;
 const COMPOSER_CONTROLS_HEIGHT = 62;
+
+function VoiceWaveform({ analyserRef }) {
+  const barsRef = useRef([]);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const analyser = analyserRef.current;
+    if (!analyser) return undefined;
+
+    const values = new Uint8Array(analyser.frequencyBinCount);
+    const smoothed = Array(28).fill(3);
+    let frameId;
+    let previousFrame = 0;
+
+    const draw = (time) => {
+      if (!containerRef.current?.isConnected) return;
+      analyser.getByteFrequencyData(values);
+      if (time - previousFrame >= 1000 / 30) {
+        const minBin = 1;
+        const maxBin = Math.min(values.length, 180);
+        const binScale = (maxBin / minBin) ** (1 / smoothed.length);
+        for (let index = 0; index < smoothed.length; index++) {
+          const from = Math.floor(minBin * binScale ** index);
+          const to = Math.min(maxBin, Math.max(from + 1, Math.floor(minBin * binScale ** (index + 1))));
+          let energy = 0;
+          for (let bin = from; bin < to; bin++) energy += (values[bin] / 255) ** 2;
+          const rms = Math.sqrt(energy / (to - from));
+          const target = Math.min(38, Math.max(3, 3 + rms * 145));
+          const factor = target > smoothed[index] ? 0.32 : 0.14;
+          smoothed[index] += (target - smoothed[index]) * factor;
+          const bar = barsRef.current[index];
+          if (bar) bar.style.height = `${smoothed[index].toFixed(1)}px`;
+        }
+        previousFrame = time;
+      }
+      frameId = requestAnimationFrame(draw);
+    };
+
+    frameId = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(frameId);
+  }, [analyserRef]);
+
+  return (
+    <span ref={containerRef} className="chat-voice-wave" role="img" aria-label="Live microphone audio waveform">
+      {Array.from({ length: 28 }, (_, index) => <i key={index} ref={(bar) => { barsRef.current[index] = bar; }} />)}
+    </span>
+  );
+}
 
 // اسم غذاهای ذکرشده در جواب بات را پیدا می‌کند تا کارت نشان بدهیم
 function findMentioned(text) {
@@ -58,9 +108,11 @@ export default function ChatSection() {
   const [processingImage, setProcessingImage] = useState(false);
   const [imageStatus, setImageStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
+  const [voiceNote, setVoiceNote] = useState("");
   const [typingIndex, setTypingIndex] = useState(null);
   const [shown, setShown] = useState(0);
-  const busy = loading || typingIndex !== null;
+  const busy = loading || typingIndex !== null || transcribing;
   const endRef = useRef(null);
   const taRef = useRef(null);
   const fileRef = useRef(null);
@@ -68,6 +120,49 @@ export default function ChatSection() {
   const widgetBox = useRef(null);
   const widgetId = useRef(null);
   const tokenRef = useRef("");
+
+  function resetCaptcha() {
+    if (SITE_KEY && window.turnstile && widgetId.current !== null) {
+      tokenRef.current = "";
+      window.turnstile.reset(widgetId.current);
+    }
+  }
+
+  async function transcribeBlob(blob) {
+    if (SITE_KEY && !tokenRef.current) {
+      setVoiceNote("لطفاً چند ثانیه صبر کن تا تایید امنیتی انجام شود و دوباره ضبط کن.");
+      return;
+    }
+    setTranscribing(true);
+    setVoiceNote("");
+    try {
+      const wav = await blobToWav16k(blob);
+      const form = new FormData();
+      form.append("audio", wav, "voice.wav");
+      form.append("token", tokenRef.current);
+      const response = await fetch("/api/transcribe", { method: "POST", body: form });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setVoiceNote(response.status === 429 ? "تعداد درخواست‌ها زیاد است، کمی بعد دوباره تلاش کن." : "تبدیل صدا به متن انجام نشد، دوباره تلاش کن.");
+        return;
+      }
+      const text = (data.text || "").trim();
+      if (!text) { setVoiceNote("صدایی تشخیص داده نشد."); return; }
+      setInput((current) => (current ? `${current} ${text}` : text).slice(0, MAX_LEN));
+      taRef.current?.focus();
+    } catch {
+      setVoiceNote("پردازش صدا انجام نشد، دوباره تلاش کن.");
+    } finally {
+      setTranscribing(false);
+      resetCaptcha();
+    }
+  }
+
+  const { recording, analyserRef, start, stop, cancel } = useVoiceRecorder({
+    onFinish: transcribeBlob,
+    onError: (code) => setVoiceNote(code === "denied" ? "دسترسی به میکروفون داده نشد. از تنظیمات مرورگر اجازه بده."
+      : code === "unsupported" ? "این مرورگر ضبط صدا را پشتیبانی نمی‌کند." : "ضبط صدا شروع نشد.")
+  });
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: typingIndex !== null ? "auto" : "smooth" });
@@ -230,7 +325,7 @@ export default function ChatSection() {
 
   async function send(text, image = null) {
     const content = text.trim() || (image ? "این غذا شبیه کدام مورد از منو است؟" : "");
-    if ((!content && !image) || busy || processingImage) return;
+    if ((!content && !image) || busy || recording || processingImage) return;
 
     if (SITE_KEY && !tokenRef.current) {
       setMessages((current) => [
@@ -289,16 +384,20 @@ export default function ChatSection() {
       setTypingIndex(next.length);
     } finally {
       setLoading(false);
-      if (SITE_KEY && window.turnstile && widgetId.current !== null) {
-        tokenRef.current = "";
-        window.turnstile.reset(widgetId.current);
-      }
+      resetCaptcha();
     }
   }
 
   function handleSubmit(event) {
     event.preventDefault();
     send(input, pendingImage);
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      send(input, pendingImage);
+    }
   }
 
   function removePendingImage() {
@@ -343,7 +442,7 @@ export default function ChatSection() {
         {!pendingImage && !messages.some((message) => message.role === "user") && (
           <div className="chat-quick" role="group" aria-label="Suggested questions">
             {QUICK.map((question) => (
-              <button key={question} type="button" className="chip" dir="auto" onMouseDown={(event) => event.preventDefault()} onClick={() => send(question)} aria-disabled={busy}>
+              <button key={question} type="button" className="chip" dir="auto" onMouseDown={(event) => event.preventDefault()} onClick={() => send(question)} disabled={busy || recording}>
                 {question}
               </button>
             ))}
@@ -362,40 +461,23 @@ export default function ChatSection() {
           </div>
         )}
 
-        <form className={`chat-form${composerExpanded ? " is-expanded" : ""}`} dir="rtl" style={{ height: composerHeight }} onSubmit={handleSubmit}>
-          <input ref={fileRef} className="chat-file-input" type="file" accept="image/*" onChange={handleImageSelect} tabIndex={-1} aria-label="انتخاب عکس غذا" />
-          <button
-            type="button"
-            className="composer-icon composer-plus"
-            onClick={() => fileRef.current?.click()}
-            aria-label="ارسال عکس غذا"
-            title="ارسال عکس غذا"
-            disabled={busy}
-          ><PlusIcon /></button>
-          <textarea
-            ref={taRef}
-            className={inputUsesArabicScript ? "is-persian" : "is-english"}
-            dir="auto"
-            rows={1}
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            onFocus={() => setTyping(true)}
-            onBlur={() => setTyping(false)}
-            placeholder="Ask ai ..."
-            aria-label="Message"
-            aria-describedby="chat-message-count"
-            maxLength={MAX_LEN}
-          />
-          <span id="chat-message-count" className="cnt">{input.length}/{MAX_LEN}</span>
-          <span className="composer-icon composer-mic" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="9" y="3" width="6" height="12" rx="3" />
-              <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6" />
-            </svg>
-          </span>
-          <button type="submit" className={`snd${input.trim() || pendingImage ? " is-ready" : ""}`} aria-label="Send" onMouseDown={(event) => event.preventDefault()} aria-disabled={busy || processingImage || (!input.trim() && !pendingImage)}>
-            <SendIcon />
-          </button>
+        {voiceNote && <p className="voice-note" role="alert" dir="auto">{voiceNote}</p>}
+        <form className={`chat-form${composerExpanded ? " is-expanded" : ""}${recording ? " is-recording" : ""}`} dir="rtl" style={{ height: composerHeight }} onSubmit={handleSubmit}>
+          <input ref={fileRef} className="chat-file-input" type="file" accept="image/*" onChange={handleImageSelect} tabIndex={-1} aria-label="Choose food image" />
+          <button type="button" className={`snd attach${recording ? " is-cancel" : ""}`} onClick={() => { if (recording) cancel(); else fileRef.current?.click(); }} aria-label={recording ? "Cancel voice recording" : "Attach food image"} title={recording ? "Cancel voice recording" : "Attach food image"}><PlusIcon /></button>
+          {recording && <>
+            <VoiceWaveform analyserRef={analyserRef} />
+            <button type="button" className="snd rec-stop" aria-label="Stop and transcribe" onClick={stop}><StopIcon /></button>
+          </>}
+          <button type="submit" className={`snd send-action${input.trim() && !busy || recording ? " is-ready" : ""}`} aria-label="Send" onMouseDown={(event) => event.preventDefault()} disabled={busy || recording || !input.trim()}><SendIcon /></button>
+          <textarea ref={taRef} className={inputUsesArabicScript ? "is-persian" : "is-english"} dir="auto" rows={1} hidden={recording} value={input}
+            onChange={(event) => setInput(event.target.value)} onKeyDown={handleKeyDown}
+            onFocus={() => setTyping(true)} onBlur={() => setTyping(false)}
+            placeholder={transcribing ? "Transcribing audio..." : "Ask ai menu..."}
+            aria-label="Message" maxLength={MAX_LEN} readOnly={transcribing} />
+          <span className="cnt" hidden={recording}>{input.length}/{MAX_LEN}</span>
+          <button type="button" className="snd mic" aria-label="Voice recording" hidden={recording}
+            onMouseDown={(event) => event.preventDefault()} onClick={() => { if (busy) return; setVoiceNote(""); start(); }}><MicIcon /></button>
         </form>
       </div>
     </section>
