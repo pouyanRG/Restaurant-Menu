@@ -765,6 +765,13 @@ a.icon-btn { text-decoration: none; color: inherit; }
 .chat-image-preview span { min-width: 0; flex: 1; overflow: hidden; color: #3f403e; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .chat-image-preview button { width: 30px; height: 30px; flex: none; border: 0; border-radius: 50%; background: #f0efea; color: #333; font-size: 22px; line-height: 1; cursor: pointer; }
 .chat-image-preview button:disabled { cursor: not-allowed; opacity: 0.55; }
+.chat-spinner {
+  width: 16px; height: 16px; flex: none; border-radius: 50%;
+  border: 2px solid #d3d3d0; border-top-color: #2f69c8;
+  animation: chat-spin .8s linear infinite;
+}
+@keyframes chat-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .chat-spinner { animation-duration: 2s; } }
 .chat-image-status { margin: 0; padding: 0 8px; color: #9b2c2c; font-size: 12px; text-align: right; }
 .chat-image-status.is-processing { color: #59615f; }
 .chat-file-input { display: none; }

@@ -1,6 +1,7 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { products } from "@/data/products";
+import { getRedis } from "@/lib/apiGuard";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -11,10 +12,10 @@ const MODELS = [
 ].filter((model, index, models) => model && models.indexOf(model) === index);
 
 const RETRY_STATUSES = new Set([404, 429, 500, 503]);
-const MAX_BODY = 4 * 1024 * 1024;
+const MAX_BODY = 200 * 1024; // عکس دیگر داخل بدنه نیست
 const MAX_MESSAGES = 12;
 const MAX_TEXT = 500;
-const MAX_IMAGE_BYTES = 2.5 * 1024 * 1024;
+const IMAGE_ID = /^[0-9a-f-]{36}$/i;
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 function createRateLimiters() {
@@ -203,28 +204,6 @@ export async function POST(request) {
 
   const recentMessages = messages.slice(-MAX_MESSAGES);
   const lastMessage = recentMessages[recentMessages.length - 1];
-  const hasEarlierImage = recentMessages.slice(0, -1).some((message) => message?.image);
-  if (hasEarlierImage) return json({ error: "Bad request" }, 400);
-
-  let imagePart = null;
-  if (lastMessage?.image !== undefined) {
-    const image = lastMessage.image;
-    if (
-      lastMessage.role !== "user" ||
-      !image ||
-      !IMAGE_TYPES.has(image.mimeType) ||
-      typeof image.data !== "string" ||
-      image.data.length > Math.ceil(MAX_IMAGE_BYTES / 3) * 4 ||
-      !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(image.data)
-    ) {
-      return json({ error: "Bad image" }, 400);
-    }
-    const padding = image.data.endsWith("==") ? 2 : image.data.endsWith("=") ? 1 : 0;
-    const imageBytes = Math.floor((image.data.length * 3) / 4) - padding;
-    if (!imageBytes || imageBytes > MAX_IMAGE_BYTES) return json({ error: "Bad image" }, 400);
-    imagePart = { inline_data: { mime_type: image.mimeType, data: image.data } };
-  }
-
   const remoteIp = request.headers.get("x-real-ip") || ip;
   if (process.env.TURNSTILE_SECRET) {
     try {
@@ -244,6 +223,26 @@ export async function POST(request) {
       console.error("Turnstile error:", error);
       return json({ error: "Captcha unavailable" }, 503);
     }
+  }
+
+  const hasEarlierImage = recentMessages.slice(0, -1).some((message) => message?.imageId);
+  if (hasEarlierImage) return json({ error: "Bad request" }, 400);
+
+  let imagePart = null;
+  if (lastMessage?.imageId !== undefined) {
+    if (lastMessage.role !== "user" || typeof lastMessage.imageId !== "string" || !IMAGE_ID.test(lastMessage.imageId)) {
+      return json({ error: "Bad image" }, 400);
+    }
+    const redis = getRedis();
+    let stored = null;
+    try {
+      stored = redis ? await redis.get(`img:${lastMessage.imageId}`) : null;
+    } catch (error) {
+      console.error("Image read error:", error);
+      return json({ error: "Storage error" }, 502);
+    }
+    if (!stored?.data || !IMAGE_TYPES.has(stored.mime)) return json({ error: "Image expired" }, 410);
+    imagePart = { inline_data: { mime_type: stored.mime, data: stored.data } };
   }
 
   const validMessages = recentMessages

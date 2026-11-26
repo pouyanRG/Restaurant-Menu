@@ -24,13 +24,38 @@ const CHAT_ERRORS = {
   413: "حجم عکس زیاد است. یک عکس کوچک‌تر انتخاب کن.",
   429: "تعداد پیام‌ها زیاد است، کمی بعد دوباره تلاش کن.",
   503: "سرویس چت موقتاً در دسترس نیست، کمی بعد امتحان کن.",
-  504: "پاسخ دیر شد، دوباره تلاش کن."
+  504: "پاسخ دیر شد، دوباره تلاش کن.",
+  410: "عکس منقضی شده، دوباره آپلودش کن."
+};
+const UPLOAD_ERRORS = {
+  400: "فرمت عکس معتبر نیست.",
+  403: "دسترسی آپلود رد شد.",
+  413: "حجم عکس زیاد است.",
+  429: "تعداد آپلودها زیاد است، کمی بعد تلاش کن.",
+  503: "سرویس آپلود موقتاً در دسترس نیست."
 };
 const MAX_LEN = 500;
 const MIN_TEXTAREA_HEIGHT = 36;
 const MAX_TEXTAREA_HEIGHT = 136;
 const COMPACT_COMPOSER_HEIGHT = 54;
 const COMPOSER_CONTROLS_HEIGHT = 62;
+
+function canvasToBlob(canvas, quality) {
+  return new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+}
+
+async function uploadImage(blob) {
+  const form = new FormData();
+  form.append("image", blob, "food.jpg");
+  const response = await fetch("/api/upload", { method: "POST", body: form });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.id) {
+    const error = new Error("upload failed");
+    error.status = response.status;
+    throw error;
+  }
+  return data.id;
+}
 
 function VoiceWaveform({ analyserRef }) {
   const barsRef = useRef([]);
@@ -184,7 +209,8 @@ export default function ChatSection() {
           : code === "empty" ? "صدایی ضبط نشد، دوباره تلاش کن."
             : "ضبط صدا شروع نشد.")
   });
-  const canSend = Boolean(input.trim() || pendingImage) && !busy && !recording && !processingImage;
+  const imageReady = !pendingImage || pendingImage.status === "ready";
+  const canSend = Boolean(input.trim() || pendingImage?.status === "ready") && imageReady && !busy && !recording && !processingImage;
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: streaming ? "auto" : "smooth" });
@@ -259,11 +285,12 @@ export default function ChatSection() {
     };
   }, []);
 
-  function handleImageSelect(event) {
+  async function handleImageSelect(event) {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
     const requestId = ++imageRequestRef.current;
+    const stale = () => requestId !== imageRequestRef.current;
     setPendingImage(null);
 
     if (!file.type.startsWith("image/") || file.type === "image/svg+xml") {
@@ -279,57 +306,67 @@ export default function ChatSection() {
 
     setProcessingImage(true);
     setImageStatus("");
-    const imageUrl = URL.createObjectURL(file);
-    const image = new Image();
-    image.onload = () => {
-      URL.revokeObjectURL(imageUrl);
-      if (requestId !== imageRequestRef.current) return;
-      setProcessingImage(false);
-      if (!image.naturalWidth || !image.naturalHeight) {
-        setImageStatus("این عکس باز نشد. لطفاً عکس دیگری انتخاب کن.");
-        return;
-      }
-      const scale = Math.min(1, 1280 / Math.max(image.naturalWidth, image.naturalHeight));
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
-      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
-      const context = canvas.getContext("2d");
-      if (!context) {
-        setProcessingImage(false);
-        setImageStatus("پردازش عکس انجام نشد. دوباره امتحان کن.");
-        return;
-      }
-      let dataUrl;
-      try {
+    try {
+      const imageUrl = URL.createObjectURL(file);
+      const image = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = imageUrl;
+      }).finally(() => URL.revokeObjectURL(imageUrl));
+      if (stale()) return;
+      if (!image.naturalWidth || !image.naturalHeight) throw new Error("empty image");
+
+      // تا زیر ۶۰۰KB فشرده می‌کنیم (سقف سرور و Upstash)
+      const attempts = [[1024, 0.78], [896, 0.65], [768, 0.55]];
+      let blob = null;
+      let canvas = null;
+      for (const [maxSide, quality] of attempts) {
+        const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+        canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+        const context = canvas.getContext("2d");
+        if (!context) throw new Error("no canvas");
         context.fillStyle = "#fff";
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.drawImage(image, 0, 0, canvas.width, canvas.height);
-        dataUrl = canvas.toDataURL("image/jpeg", 0.82);
-      } catch {
-        setProcessingImage(false);
-        setImageStatus("پردازش عکس انجام نشد. لطفاً عکس دیگری انتخاب کن.");
-        return;
+        blob = await canvasToBlob(canvas, quality);
+        if (blob && blob.size <= 600 * 1024) break;
       }
-      if (dataUrl.length > 3_500_000) {
+      if (!blob || blob.size > 600 * 1024) {
         setProcessingImage(false);
         setImageStatus("حجم عکس زیاد است. یک عکس کوچک‌تر انتخاب کن.");
         return;
       }
-      setPendingImage({ dataUrl, mimeType: "image/jpeg", name: file.name });
+
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.78);
+      if (stale()) return;
+      setPendingImage({ dataUrl, name: file.name, id: null, status: "uploading" });
       setProcessingImage(false);
-    };
-    image.onerror = () => {
-      URL.revokeObjectURL(imageUrl);
-      if (requestId !== imageRequestRef.current) return;
+
+      try {
+        const id = await uploadImage(blob);
+        if (stale()) return;
+        setPendingImage({ dataUrl, name: file.name, id, status: "ready" });
+      } catch (error) {
+        console.error("Image upload failed:", error);
+        if (stale()) return;
+        setPendingImage(null);
+        setImageStatus(UPLOAD_ERRORS[error?.status] || "آپلود عکس انجام نشد. دوباره تلاش کن.");
+      }
+    } catch (error) {
+      console.error("Image processing failed:", error);
+      if (stale()) return;
       setProcessingImage(false);
       setImageStatus("این عکس باز نشد. لطفاً عکس دیگری انتخاب کن.");
-    };
-    image.src = imageUrl;
+    }
   }
 
   async function send(text, image = null) {
     const content = text.trim() || (image ? "این غذا شبیه کدام مورد از منو است؟" : "");
     if ((!content && !image) || busy || recording || processingImage) return;
+    if (image && image.status !== "ready") return;
 
     if (SITE_KEY && !tokenRef.current) {
       setMessages((current) => [
@@ -355,13 +392,7 @@ export default function ChatSection() {
         const textMessage = { ...message };
         delete textMessage.image;
         if (image && index === next.length - 1) {
-          return {
-            ...textMessage,
-            image: {
-              mimeType: image.mimeType,
-              data: image.dataUrl.slice(image.dataUrl.indexOf(",") + 1)
-            }
-          };
+          return { ...textMessage, imageId: image.id };
         }
         return textMessage;
       });
@@ -471,7 +502,10 @@ export default function ChatSection() {
         {pendingImage && (
           <div className="chat-image-preview" dir="rtl">
             <img src={pendingImage.dataUrl} alt="پیش‌نمایش عکس غذا" />
-            <span>{pendingImage.name}</span>
+            <span>
+              {pendingImage.status === "uploading" ? "در حال آپلود…" : "آپلود شد ✓"}
+            </span>
+            {pendingImage.status === "uploading" && <i className="chat-spinner" aria-hidden="true" />}
             <button type="button" onClick={removePendingImage} aria-label="حذف عکس انتخاب‌شده" disabled={busy}>×</button>
           </div>
         )}
